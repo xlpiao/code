@@ -1,0 +1,31 @@
+%%%%%%%%%% NodeJS Client %%%%%%%%%%
+$node
+client = require('./client');
+host='localhost';
+port=5000;
+c = new client(host, port);
+c.receive();
+
+id = 'c001';
+msg = '[This is Node]';
+data = ['{"' id '":' msg '}'];
+
+c.send(data);
+c.queue.toString()
+
+
+%%%%%%%%%%  MatLab server %%%%%%%%%%
+$matlab -nodisplay
+host='localhost';
+port=5000;
+s = server(host, port);
+s.receive();
+
+im = JSON.parse(s.Q.dequeue);
+ids = fieldnames(im);
+
+id = ids{1};
+msg = '[This is MatLab]';
+data = ['{"' id '":' msg '}'];
+
+s.send(data);
