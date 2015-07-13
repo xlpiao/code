@@ -1,0 +1,19 @@
+%%%%%%%%%% NodeJS Client %%%%%%%%%%
+$node
+host='localhost';
+port=3000;
+client = require('./client');
+c = new client(host, port);
+c.receive();
+
+c.send('this is node\n');
+
+
+%%%%%%%%%%  MatLab server %%%%%%%%%%
+$matlab -nodisplay
+host='localhost';
+port=3000;
+s = server(host, port);
+s.receive();
+
+s.send('this is matlab');
