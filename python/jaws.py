@@ -18,7 +18,7 @@ def main(argv):
         def format_epilog(self, formatter):
             return self.epilog
 
-    parser = MyParser( 
+    parser = MyParser(
                      usage = "%prog [options] <command line> [<arg1>...]",
                      version = __version__,
                      epilog =\
@@ -62,11 +62,11 @@ Example:
     )
 
     (options, args) = parser.parse_args()
-    
+
     if len(args) == 0:
         parser.print_help()
     else:
-        text = run(args, options.loop, options.sleep, options.timeout, options.file)    
+        text = run(args, options.loop, options.sleep, options.timeout, options.file)
         if options.to is not None:
             subject = " ".join(args)
             mailto(options.to, subject, text)
@@ -83,14 +83,14 @@ def run(cmd, loop=1, sleep=5, timeout=0, f="jaws.log", timer=False, stdout=True)
     assert isinstance(stdout, bool)
 
     cmd = map(os.path.expanduser, cmd)
-    
-    if stdout: 
+
+    if stdout:
         print " ".join(cmd)
-    
+
     result = "## %s\n## %s\n" % (datetime.now(), " ".join(cmd))
     fp = open(f, "a+")
     fp.write("%s" % result)
-    
+
     for i in range(0, loop):
         if timeout > 0:
             start = datetime.now()
@@ -159,11 +159,11 @@ def try_parse(v):
             ret = v
     return ret
 
-def printCSV(array2d, indicator):
+def printCSV(datalist, indicator):
     ret = ""
-    for array1d in array2d:
-        ret += indicator.join(str(x) for x in array1d)
-        ret += "\n"
+    for data in datalist:
+        ret += indicator.join(str(x) for x in data)
+        ret += "\t"
     return ret
 
 def mailto(TO, subject, text):
