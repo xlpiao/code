@@ -3,7 +3,7 @@
 import jaws
 import os
 
-DIR = "/home/hlpark/Dropbox/company100/scripts"
+DIR = "/home/hlpark/workspace/scripts"
 line = open(DIR+"/log").read().splitlines()
 
 print("\n\033[0;37m%s\n" % ("***** START *****"));
