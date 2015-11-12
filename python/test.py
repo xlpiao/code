@@ -15,7 +15,7 @@ print("\033[1;31m%s\033[0;38m" % (out_item));
 idx = 1
 result = []
 for l in line:
-    data = jaws.findall(l, r'\d+.\d+')
+    data = jaws.findall(l, r'[0-9]*\.[0-9]+.')
     if data:
         result.append(data)
         if (idx % len(item) == 0):
