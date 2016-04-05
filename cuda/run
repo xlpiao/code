@@ -1,0 +1,4 @@
+make clean
+make clean && make sobelfilter && ./bin.sobelfilter
+
+gnome-open lena_grey_output.pgm 

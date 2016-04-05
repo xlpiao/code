@@ -1,0 +1,187 @@
+rm -f bin.* *_output.pgm *_output.ppm
+nvcc -O0 -g -arch sm_13 -o bin.grey_sobelfilter_global ./src/grey_sobelfilter_global.cu -I/usr/local/cuda/samples/common/inc/
+nvcc -O0 -g -arch sm_13 -o bin.grey_sobelfilter_tex ./src/grey_sobelfilter_tex.cu -I/usr/local/cuda/samples/common/inc/
+nvcc -O0 -g -arch sm_13 -o bin.grey_sobelfilter_local ./src/grey_sobelfilter_local.cu -I/usr/local/cuda/samples/common/inc/
+nvcc -O0 -g -arch sm_13 -o bin.rgba_sobelfilter_global ./src/rgba_sobelfilter_global.cu -I/usr/local/cuda/samples/common/inc/
+nvcc -O0 -g -arch sm_13 -o bin.rgba_sobelfilter_tex ./src/rgba_sobelfilter_tex.cu -I/usr/local/cuda/samples/common/inc/
+nvcc -O0 -g -arch sm_13 -o bin.rgba_sobelfilter_local ./src/rgba_sobelfilter_local.cu -I/usr/local/cuda/samples/common/inc/
+Open ./img/lena_grey_128.pgm
+Original Image Size: [128, 128], size: 16384
+Target      Image Size: [128, 128], size: 16384
+Processing time: 0.059000 (ms)
+Wrote 'lena_grey_128_global_output.pgm'
+
+Open ./img/lena_grey_128.pgm
+Original Image Size: [128, 128], size: 16384
+New      Image Size: [128, 128], size: 16384
+Processing time: 0.066000 (ms)
+Wrote 'lena_grey_128_local_output.pgm'
+
+Open ./img/lena_grey_128.pgm
+Original Image Size: [128, 128], size: 16384
+Target   Image Size: [128, 128], size: 16384
+Processing time: 0.069000 (ms)
+Wrote 'lena_grey_128_tex_output.pgm'
+
+Open ./img/lena_grey_256.pgm
+Original Image Size: [256, 256], size: 65536
+Target      Image Size: [256, 256], size: 65536
+Processing time: 0.172000 (ms)
+Wrote 'lena_grey_256_global_output.pgm'
+
+Open ./img/lena_grey_256.pgm
+Original Image Size: [256, 256], size: 65536
+New      Image Size: [256, 256], size: 65536
+Processing time: 0.181000 (ms)
+Wrote 'lena_grey_256_local_output.pgm'
+
+Open ./img/lena_grey_256.pgm
+Original Image Size: [256, 256], size: 65536
+Target   Image Size: [256, 256], size: 65536
+Processing time: 0.171000 (ms)
+Wrote 'lena_grey_256_tex_output.pgm'
+
+Open ./img/lena_grey_512.pgm
+Original Image Size: [512, 512], size: 262144
+Target      Image Size: [512, 512], size: 262144
+Processing time: 0.536000 (ms)
+Wrote 'lena_grey_512_global_output.pgm'
+
+Open ./img/lena_grey_512.pgm
+Original Image Size: [512, 512], size: 262144
+New      Image Size: [512, 512], size: 262144
+Processing time: 0.640000 (ms)
+Wrote 'lena_grey_512_local_output.pgm'
+
+Open ./img/lena_grey_512.pgm
+Original Image Size: [512, 512], size: 262144
+Target   Image Size: [512, 512], size: 262144
+Processing time: 0.590000 (ms)
+Wrote 'lena_grey_512_tex_output.pgm'
+
+Open ./img/lena_grey_1024.pgm
+Original Image Size: [1024, 1024], size: 1048576
+Target      Image Size: [1024, 1024], size: 1048576
+Processing time: 2.028000 (ms)
+Wrote 'lena_grey_1024_global_output.pgm'
+
+Open ./img/lena_grey_1024.pgm
+Original Image Size: [1024, 1024], size: 1048576
+New      Image Size: [1024, 1024], size: 1048576
+Processing time: 2.449000 (ms)
+Wrote 'lena_grey_1024_local_output.pgm'
+
+Open ./img/lena_grey_1024.pgm
+Original Image Size: [1024, 1024], size: 1048576
+Target   Image Size: [1024, 1024], size: 1048576
+Processing time: 2.334000 (ms)
+Wrote 'lena_grey_1024_tex_output.pgm'
+
+Open ./img/lena_grey_2048.pgm
+Original Image Size: [2048, 2048], size: 4194304
+Target      Image Size: [2048, 2048], size: 4194304
+Processing time: 7.764000 (ms)
+Wrote 'lena_grey_2048_global_output.pgm'
+
+Open ./img/lena_grey_2048.pgm
+Original Image Size: [2048, 2048], size: 4194304
+New      Image Size: [2048, 2048], size: 4194304
+Processing time: 9.518000 (ms)
+Wrote 'lena_grey_2048_local_output.pgm'
+
+Open ./img/lena_grey_2048.pgm
+Original Image Size: [2048, 2048], size: 4194304
+Target   Image Size: [2048, 2048], size: 4194304
+Processing time: 8.785000 (ms)
+Wrote 'lena_grey_2048_tex_output.pgm'
+
+Open ./img/lena_rgba_128.ppm
+Original Image Size: [128, 128], size: 65536
+New      Image Size: [128, 128], size: 65536
+Processing time: 0.112000 (ms)
+Wrote 'lena_rgba_128_global_output.ppm'
+
+Open ./img/lena_rgba_128.ppm
+Original Image Size: [128, 128], size: 65536
+New      Image Size: [128, 128], size: 65536
+Processing time: 0.097000 (ms)
+Wrote 'lena_rgba_128_local_output.ppm'
+
+Open ./img/lena_rgba_128.ppm
+Original Image Size: [128, 128], size: 65536
+New      Image Size: [128, 128], size: 65536
+Processing time: 0.069000 (ms)
+Wrote 'lena_rgba_128_tex_output.ppm'
+
+Open ./img/lena_rgba_256.ppm
+Original Image Size: [256, 256], size: 262144
+New      Image Size: [256, 256], size: 262144
+Processing time: 0.348000 (ms)
+Wrote 'lena_rgba_256_global_output.ppm'
+
+Open ./img/lena_rgba_256.ppm
+Original Image Size: [256, 256], size: 262144
+New      Image Size: [256, 256], size: 262144
+Processing time: 0.274000 (ms)
+Wrote 'lena_rgba_256_local_output.ppm'
+
+Open ./img/lena_rgba_256.ppm
+Original Image Size: [256, 256], size: 262144
+New      Image Size: [256, 256], size: 262144
+Processing time: 0.181000 (ms)
+Wrote 'lena_rgba_256_tex_output.ppm'
+
+Open ./img/lena_rgba_512.ppm
+Original Image Size: [512, 512], size: 1048576
+New      Image Size: [512, 512], size: 1048576
+Processing time: 1.229000 (ms)
+Wrote 'lena_rgba_512_global_output.ppm'
+
+Open ./img/lena_rgba_512.ppm
+Original Image Size: [512, 512], size: 1048576
+New      Image Size: [512, 512], size: 1048576
+Processing time: 0.919000 (ms)
+Wrote 'lena_rgba_512_local_output.ppm'
+
+Open ./img/lena_rgba_512.ppm
+Original Image Size: [512, 512], size: 1048576
+New      Image Size: [512, 512], size: 1048576
+Processing time: 0.682000 (ms)
+Wrote 'lena_rgba_512_tex_output.ppm'
+
+Open ./img/lena_rgba_1024.ppm
+Original Image Size: [1024, 1024], size: 4194304
+New      Image Size: [1024, 1024], size: 4194304
+Processing time: 4.794000 (ms)
+Wrote 'lena_rgba_1024_global_output.ppm'
+
+Open ./img/lena_rgba_1024.ppm
+Original Image Size: [1024, 1024], size: 4194304
+New      Image Size: [1024, 1024], size: 4194304
+Processing time: 3.338000 (ms)
+Wrote 'lena_rgba_1024_local_output.ppm'
+
+Open ./img/lena_rgba_1024.ppm
+Original Image Size: [1024, 1024], size: 4194304
+New      Image Size: [1024, 1024], size: 4194304
+Processing time: 2.158000 (ms)
+Wrote 'lena_rgba_1024_tex_output.ppm'
+
+Open ./img/lena_rgba_2048.ppm
+Original Image Size: [2048, 2048], size: 16777216
+New      Image Size: [2048, 2048], size: 16777216
+Processing time: 19.270000 (ms)
+Wrote 'lena_rgba_2048_global_output.ppm'
+
+Open ./img/lena_rgba_2048.ppm
+Original Image Size: [2048, 2048], size: 16777216
+New      Image Size: [2048, 2048], size: 16777216
+Processing time: 12.835000 (ms)
+Wrote 'lena_rgba_2048_local_output.ppm'
+
+Open ./img/lena_rgba_2048.ppm
+Original Image Size: [2048, 2048], size: 16777216
+New      Image Size: [2048, 2048], size: 16777216
+Processing time: 8.097000 (ms)
+Wrote 'lena_rgba_2048_tex_output.ppm'
+
