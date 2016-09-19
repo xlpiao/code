@@ -106,36 +106,14 @@ void		DisplayFunc(void)
   glFlush();
 
   /* Copy buffer to texture */
-  // glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 4, 4, 0, 0, SIZE - 8, SIZE - 8);
-
-  // if (glIsTexture(texture_id) == GL_FALSE)
-    glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, window_width, window_height, 0);
-  // else
-    // glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 4, 4, 0, 0, SIZE - 8, SIZE - 8);
-
-// void glCopyTexSubImage2D(    GLenum target,
-     // GLint level,
-     // GLint xoffset,
-     // GLint yoffset,
-     // GLint x,
-     // GLint y,
-     // GLsizei width,
-     // GLsizei height);
-// void glCopyTexImage2D(    GLenum target,
-     // GLint level,
-     // GLenum internalformat,
-     // GLint x,
-     // GLint y,
-     // GLsizei width,
-     // GLsizei height,
-     // GLint border);
+  glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 4, 4, 0, 0, SIZE - 8, SIZE - 8);
 
   /* Render to screen */
-  // glMatrixMode(GL_PROJECTION);
-  // glLoadIdentity();
-  // gluPerspective(20, window_width / (float) window_height, 5, 15);
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  gluPerspective(20, window_width / (float) window_height, 5, 15);
   glViewport(0, 0, window_width, window_height);
-  // glMatrixMode(GL_MODELVIEW);
+  glMatrixMode(GL_MODELVIEW);
   glClearColor(0, 1, 0, 0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   Cube();
