@@ -103,10 +103,13 @@ void		DisplayFunc(void)
   glClearColor(1, 0, 0, 0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   Cube();
+  glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, SIZE, SIZE, 0);
   glFlush();
 
   /* Copy buffer to texture */
-  glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 4, 4, 0, 0, SIZE - 8, SIZE - 8);
+  // glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, SIZE, SIZE, 0);
+  // glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, SIZE, SIZE);
+  // glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 4, 4, 0, 0, SIZE - 8, SIZE - 8);
 
   /* Render to screen */
   glMatrixMode(GL_PROJECTION);
@@ -117,6 +120,7 @@ void		DisplayFunc(void)
   glClearColor(0, 1, 0, 0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   Cube();
+  glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, window_width, window_height, 0);
   glFlush();
 
   glutSwapBuffers();
@@ -170,8 +174,6 @@ int		main(int argc, char **argv)
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-  // glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, window_width, window_height, 0);
-  // glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, SIZE, SIZE, 0);
 
   /* Declaration of the callbacks */
   glutDisplayFunc(&DisplayFunc);
