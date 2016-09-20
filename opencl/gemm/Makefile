@@ -10,7 +10,7 @@ endif
 
 all: gemm
 
-gemm: gemm.c
-	gcc -o gemm gemm.c $(LIBS)
+gemm: gemm.cpp
+	g++ -o gemm gemm.cpp $(LIBS)
 clean:
 	rm -f gemm
