@@ -149,7 +149,7 @@ void keyboard (unsigned char key, int x, int y)
       case 's':
       case 'S':
          glBindTexture(GL_TEXTURE_2D, texName);
-         glTexSubImage2D(GL_TEXTURE_2D, 0, 12, 44, subImageWidth,
+         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, subImageWidth,
                          subImageHeight, GL_RGBA,
                          GL_UNSIGNED_BYTE, subImage);
          glutPostRedisplay();
