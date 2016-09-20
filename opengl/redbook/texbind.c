@@ -47,7 +47,8 @@
     #include <GL/gl.h>
     #include <GL/glu.h>
     #include <GL/glut.h>
-#endif#include <stdlib.h>
+#endif
+#include <stdlib.h>
 #include <stdio.h>
 
 #ifdef GL_VERSION_1_1
