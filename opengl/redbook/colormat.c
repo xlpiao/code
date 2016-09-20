@@ -49,7 +49,8 @@
     #include <GL/gl.h>
     #include <GL/glu.h>
     #include <GL/glut.h>
-#endif#include <stdlib.h>
+#endif
+#include <stdlib.h>
 
 GLfloat diffuseMaterial[4] = { 0.5, 0.5, 0.5, 1.0 };
 
