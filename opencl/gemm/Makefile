@@ -1,5 +1,6 @@
-# I tested gemm.c in Ubuntu 12.04 with OpenCL SDK and NVIDIA Driver installed
-# run: ./gemm 1024
+# prerequisite: OpenCL SDK and NVIDIA Driver installed
+# build: make clean && make
+# run:   ./gemm 512
 
 OS=$(shell uname -s)
 ifeq ($(OS), Linux)
