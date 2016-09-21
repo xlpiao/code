@@ -13,3 +13,5 @@ include_directories(~/workspace/code/cmake/02_student-lib-shared/include)
 
 add_executable(libtest libtest.cpp)
 target_link_libraries(libtest ${PROJECT_LINK_LIBS} )
+
+install (TARGETS libtest DESTINATION /usr/bin)
