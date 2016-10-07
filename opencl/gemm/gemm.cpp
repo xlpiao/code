@@ -397,17 +397,17 @@ int main(int argc, char* argv[])
     for(int i=0; i<numPlatforms; i++){
         char stringOfPlatform[1024];
         err = clGetPlatformInfo(clPlatformIDs[i], CL_PLATFORM_NAME, sizeof(stringOfPlatform), &stringOfPlatform, NULL);
-        printf("\033[0;31mPlatform[%d]\033[0;37m: %s\n", i, stringOfPlatform);
+        printf("\033[0;31mPlatforms[%d]\033[0;37m: %s\n", i, stringOfPlatform);
         
         err = clGetDeviceIDs (clPlatformIDs[i], CL_DEVICE_TYPE_ALL, 0, NULL, &numDevices);
-        printf("(%d Devices Found in Platform[%d])\n\n", numDevices, i);
+        printf("(%d Devices Found in Platforms[%d])\n\n", numDevices, i);
         clDeviceIDs = (cl_device_id*)malloc(numDevices * sizeof(cl_device_id));
 
         err = clGetDeviceIDs (clPlatformIDs[i], CL_DEVICE_TYPE_ALL, numDevices, clDeviceIDs, &numDevices);        
         for(int j = 0; j < numDevices; j++ ){
             char stringOfDevice[1024];
             err = clGetDeviceInfo(clDeviceIDs[j], CL_DEVICE_NAME, sizeof(stringOfDevice), &stringOfDevice, NULL);
-            printf("\033[0;31m(Platform[%d], Device[%d])\033[0;37m: %s\n", i, j, stringOfDevice);
+            printf("\033[0;31m(Platforms[%d], Devices[%d])\033[0;37m: %s\n", i, j, stringOfDevice);
             clPrintDevInfo(clDeviceIDs[j]);
 
             cl_device_type type;
