@@ -378,13 +378,15 @@ int main(int argc, char* argv[])
     init(A, B, C);
     seqGemm();
 
-    pthread_t thread1, thread2;
-
     cl_platform_id* clPlatformIDs;
     cl_uint numPlatforms;
     cl_device_id* clDeviceIDs;
     cl_uint numDevices;
     cl_int err;
+
+    // pthread_t *threads;
+    int numThreads;
+    int ret;
 
     err = clGetPlatformIDs (0, NULL, &numPlatforms);
     printf("\n\033[0;37m%d Platforms Found:\n\n", numPlatforms);
@@ -400,6 +402,9 @@ int main(int argc, char* argv[])
         printf("%d Devices found in Platfrom[%d]:\n\n", numDevices, i);
         clDeviceIDs = (cl_device_id*)malloc(numDevices * sizeof(cl_device_id));
 
+        numThreads = numPlatforms * numDevices;
+        pthread_t threads[numThreads];
+
         err = clGetDeviceIDs (clPlatformIDs[i], CL_DEVICE_TYPE_ALL, numDevices, clDeviceIDs, &numDevices);        
         for(int j = 0; j < numDevices; j++ ){
             char stringOfDevice[1024];
@@ -411,13 +416,13 @@ int main(int argc, char* argv[])
             clGetDeviceInfo(clDeviceIDs[j], CL_DEVICE_TYPE, sizeof(type), &type, NULL);
             if( type & CL_DEVICE_TYPE_CPU ){
                 printf("\n----- Compute In %s -----\n", "CL_DEVICE_TYPE_CPU");
-                int ret1 = pthread_create(&thread1, NULL, computeInDevice, clDeviceIDs[j]);
-                pthread_join(thread1, NULL);
+                ret = pthread_create(&threads[i+j*numDevices], NULL, computeInDevice, clDeviceIDs[j]);
+                pthread_join(threads[i+j*numDevices], NULL);
             }
             else if( type & CL_DEVICE_TYPE_GPU ){
                 printf("\n----- Compute In %s -----\n", "CL_DEVICE_TYPE_GPU");
-                int ret2 = pthread_create(&thread2, NULL, computeInDevice, clDeviceIDs[j]);
-                pthread_join(thread2, NULL);
+                ret = pthread_create(&threads[i+j*numDevices], NULL, computeInDevice, clDeviceIDs[j]);
+                pthread_join(threads[i+j*numDevices], NULL);
             }
             else if( type & CL_DEVICE_TYPE_ACCELERATOR ){
                 printf("\n----- Compute In %s -----\n", "CL_DEVICE_TYPE_ACCELERATOR");
@@ -429,8 +434,6 @@ int main(int argc, char* argv[])
         printf("\n");
     }
 
-    pthread_join(thread1, NULL);
-    pthread_join(thread2, NULL);
 
     free(A);
     free(B);
