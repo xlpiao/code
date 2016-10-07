@@ -414,15 +414,15 @@ int main(int argc, char* argv[])
                 int ret1 = pthread_create(&thread1, NULL, computeInDevice, clDeviceIDs[j]);
                 pthread_join(thread1, NULL);
             }
-            if( type & CL_DEVICE_TYPE_GPU ){
+            else if( type & CL_DEVICE_TYPE_GPU ){
                 printf("\n----- Compute In %s -----\n", "CL_DEVICE_TYPE_GPU");
                 int ret2 = pthread_create(&thread2, NULL, computeInDevice, clDeviceIDs[j]);
                 pthread_join(thread2, NULL);
             }
-            if( type & CL_DEVICE_TYPE_ACCELERATOR ){
+            else if( type & CL_DEVICE_TYPE_ACCELERATOR ){
                 printf("\n----- Compute In %s -----\n", "CL_DEVICE_TYPE_ACCELERATOR");
             }
-            if( type & CL_DEVICE_TYPE_DEFAULT ){
+            else if( type & CL_DEVICE_TYPE_DEFAULT ){
                 printf("\n----- Compute In %s -----\n", "CL_DEVICE_TYPE_DEFAULT");
             }
         }
