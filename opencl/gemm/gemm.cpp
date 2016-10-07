@@ -365,6 +365,8 @@ void *computeInDevice(void *arg)
     err = clReleaseCommandQueue(clCommandQueue);
     err = clReleaseContext(clContext);
     if(err != CL_SUCCESS) printf("Error: clRelease\n");
+
+    return NULL;
 }
 
 int main(int argc, char* argv[])
