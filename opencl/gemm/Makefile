@@ -6,7 +6,7 @@ OS=$(shell uname -s)
 ifeq ($(OS), Linux)
 	LIBS=-lOpenCL -lpthread -lm -std=gnu99
 else
-	LIBS=-framework opencl -stdlib=libstdc++ -lstdc++
+	LIBS=-framework opencl -stdlib=libc++ -lstdc++
 endif
 
 all: gemm
