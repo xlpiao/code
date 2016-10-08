@@ -47,6 +47,11 @@ Outlines: Outlines.c
 OpenGLInfo: OpenGLInfo.c
 	clang -o bin.OpenGLInfo OpenGLInfo.c $(LIBPATH) $(LIBS) -Wno-deprecated-declarations
 
+DumpState: DumpState.c
+	clang -o bin.DumpState DumpState.c $(LIBPATH) $(LIBS) -Wno-deprecated-declarations
+
+GLInfo: GLInfo.c
+	clang -o bin.GLInfo GLInfo.c $(LIBPATH) $(LIBS) -Wno-deprecated-declarations
 
 clean:
 	rm -f bin.triangle bin.rectangle bin.SpinningCube bin.VertexArray bin.DisplayLists bin.Viewport bin.Billboard bin.RenderToTexture bin.TextureGen bin.Outlines bin.Water bin.OpenGLInfo
