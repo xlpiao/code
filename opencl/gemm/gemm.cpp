@@ -40,10 +40,11 @@
 #define LOCAL_WORK_GROUP_Y 1
 #define ALPHA 1
 #define BETA 1
+
+int N;
 float* A;
 float* B;
 float* C;
-int N;
 float* seqOutput;
 
 
