@@ -10,3 +10,5 @@ SRC = glinfo.c
 all:
 	${CC} ${FLAGS} ${FRAMEWORKS} -o ${BIN} ${SRC} ${INC} ${LOC_LIB}
 
+clean:
+	rm ${BIN} *.gcno *.gcda

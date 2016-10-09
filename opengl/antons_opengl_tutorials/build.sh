@@ -3,7 +3,7 @@ for dir in ./[0-9]*; do
         cd "$dir"
         echo "$dir"
         make -f Makefile.osx
-        # make clean 
+        # make -f Makefile.osx clean
         cd ..
     fi
 done
