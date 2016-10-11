@@ -8,37 +8,31 @@ static void
 query_ATI_meminfo(void)
 {
     // #ifdef GL_ATI_meminfo
-    int i[4];
+    int mem[4];
     printf("Memory info (GL_ATI_meminfo):\n");
     glGetIntegerv(GL_VBO_FREE_MEMORY_ATI, i);
-    printf("    VBO free memory - total: %u MB, largest block: %u MB\n",
-            i[0] / 1024, i[1] / 1024);
-    printf("    VBO free aux. memory - total: %u MB, largest block: %u MB\n",
-            i[2] / 1024, i[3] / 1024);
+    printf("    VBO free memory - total: %u MB, largest block: %u MB\n", mem[0] / 1024, mem[1] / 1024);
+    printf("    VBO free aux. memory - total: %u MB, largest block: %u MB\n", mem[2] / 1024, mem[3] / 1024);
     glGetIntegerv(GL_TEXTURE_FREE_MEMORY_ATI, i);
-    printf("    Texture free memory - total: %u MB, largest block: %u MB\n",
-            i[0] / 1024, i[1] / 1024);
-    printf("    Texture free aux. memory - total: %u MB, largest block: %u MB\n",
-            i[2] / 1024, i[3] / 1024);
+    printf("    Texture free memory - total: %u MB, largest block: %u MB\n", mem[0] / 1024, mem[1] / 1024);
+    printf("    Texture free aux. memory - total: %u MB, largest block: %u MB\n", mem[2] / 1024, mem[3] / 1024);
     glGetIntegerv(GL_RENDERBUFFER_FREE_MEMORY_ATI, i);
-    printf("    Renderbuffer free memory - total: %u MB, largest block: %u MB\n",
-            i[0] / 1024, i[1] / 1024);
-    printf("    Renderbuffer free aux. memory - total: %u MB, largest block: %u MB\n",
-            i[2] / 1024, i[3] / 1024);
+    printf("    Renderbuffer free memory - total: %u MB, largest block: %u MB\n", mem[0] / 1024, mem[1] / 1024);
+    printf("    Renderbuffer free aux. memory - total: %u MB, largest block: %u MB\n", mem[2] / 1024, mem[3] / 1024);
     // #endif
 }
 static void
 query_NVX_gpu_memory_info(void)
 {
     // #ifdef GL_NVX_gpu_memory_info
-    int i;
+    int mem;
     printf("Memory info (GL_NVX_gpu_memory_info):\n");
-    glGetIntegerv(GL_GPU_MEMORY_INFO_DEDICATED_VIDMEM_NVX, &i);
-    printf("    Dedicated video memory: %u MB\n", i / 1024);
-    glGetIntegerv(GL_GPU_MEMORY_INFO_TOTAL_AVAILABLE_MEMORY_NVX, &i);
-    printf("    Total available memory: %u MB\n", i / 1024);
-    glGetIntegerv(GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX, &i);
-    printf("    Currently available dedicated video memory: %u MB\n", i / 1024);
+    glGetIntegerv(GL_GPU_MEMORY_INFO_DEDICATED_VIDMEM_NVX, &mem);
+    printf("    Dedicated video memory: %u MB\n", mem / 1024);
+    glGetIntegerv(GL_GPU_MEMORY_INFO_TOTAL_AVAILABLE_MEMORY_NVX, &mem);
+    printf("    Total available memory: %u MB\n", mem / 1024);
+    glGetIntegerv(GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX, &mem);
+    printf("    Currently available dedicated video memory: %u MB\n", mem / 1024);
     // #endif
 }
 void
