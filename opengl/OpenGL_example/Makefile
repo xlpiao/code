@@ -54,4 +54,4 @@ GLInfo: GLInfo.c
 	clang -o bin.GLInfo GLInfo.c $(LIBPATH) $(LIBS) -Wno-deprecated-declarations
 
 clean:
-	rm -f bin.triangle bin.rectangle bin.SpinningCube bin.VertexArray bin.DisplayLists bin.Viewport bin.Billboard bin.RenderToTexture bin.TextureGen bin.Outlines bin.Water bin.OpenGLInfo
+	rm -f bin.triangle bin.rectangle bin.SpinningCube bin.VertexArray bin.DisplayLists bin.Viewport bin.Billboard bin.RenderToTexture bin.TextureGen bin.Outlines bin.Water bin.OpenGLInfo bin.DumpState bin.GLInfo
