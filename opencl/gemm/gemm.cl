@@ -1,4 +1,9 @@
-__kernel void gemm(__global float *a, __global float *b, __global float *c, float alpha, float beta, int n)
+__kernel void gemm(__global float *a,
+                   __global float *b,
+                   __global float *c,
+                   float alpha,
+                   float beta,
+                   int n)
 {
 	int i = get_global_id(0);
 	int j = get_global_id(1);
