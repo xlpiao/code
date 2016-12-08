@@ -153,8 +153,12 @@ int main(int arg_co, char** args){
         GLuint sampler=0;
         glGenSamplers(1, &sampler);
         glSamplerParameteri(sampler, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        // glSamplerParameteri(sampler, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glSamplerParameteri(sampler, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         // glSamplerParameteri(sampler, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+
+        // glSamplerParameteri(sampler, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        // glSamplerParameteri(sampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
         const int texUnit=0;
         GLuint samplerUniform = glGetUniformLocation(program, "texSampler");
         glUniform1i(samplerUniform, texUnit);
