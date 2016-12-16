@@ -9,9 +9,13 @@ else
 	LIBS=-framework opencl -stdlib=libc++ -lstdc++
 endif
 
-all: gemm
+all: gemm multi_queue
 
 gemm: gemm.cpp
-	g++ -o gemm gemm.cpp $(LIBS)
+	g++ -o bin.gemm gemm.cpp $(LIBS)
+
+multi_queue: multi_queue.cpp
+	g++ -o bin.multi_queue multi_queue.cpp $(LIBS)
+
 clean:
-	rm -f gemm
+	rm -f bin.*
