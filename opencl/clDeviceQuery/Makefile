@@ -2,7 +2,7 @@ OS=$(shell uname -s)
 ifeq ($(OS), Linux)
 	LIBS=-lOpenCL
 else
-	LIBS=-framework opencl -stdlib=libstdc++ -lstdc++
+	LIBS=-framework opencl -stdlib=libc++ -lstdc++
 endif
 
 all: clDeviceQuery
