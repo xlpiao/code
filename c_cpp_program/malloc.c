@@ -21,6 +21,10 @@ int main (void)
     printf("String = %s\n", str);
 
     /* Reallocating memory */
+    /*
+     * if str is null, malloc
+     * else, resize allocation.
+     */
     str = (char *) realloc(str, 30);
     strcat(str, ".com");
     printf("String = %s\n", str);
