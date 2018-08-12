@@ -1,5 +1,13 @@
+/**
+ * File              : dfs.cpp
+ * Author            : Xianglan Piao <xianglan0502@gmail.com>
+ * Date              : 2018.08.11
+ * Last Modified Date: 2018.08.11
+ * Last Modified By  : Xianglan Piao <xianglan0502@gmail.com>
+ */
 // A simple representation of graph using STL
-#include<bits/stdc++.h>
+#include <iostream>
+#include <vector>
 using namespace std;
  
 // A utility function to add an edge in an
@@ -16,11 +24,11 @@ void printGraph(vector<int> adj[], int V)
 {
     for (int v = 0; v < V; ++v)
     {
-        cout << "\n Adjacency list of vertex "
-             << v << "\n head ";
-        for (auto x : adj[v])
-           cout << "-> " << x;
-        printf("\n");
+        std::cout << "\n Adjacency list of vertex " << v << "\n head ";
+        // for (auto x : adj[v])
+        for (std::vector<int>::iterator it = adj[v].begin() ; it != adj[v].end(); ++it)
+           std::cout << " -> " << *it;
+        std::cout << "\n";
     }
 }
  
