@@ -74,8 +74,8 @@ void Teapot(void) {
 ** Function called to update rendering
 */
 void DisplayFunc(void) {
-    glEnable(GL_SCISSOR_TEST);
-    glScissor((float)width / 4, (float)height / 4, (float)width, (float)height);
+    // glEnable(GL_SCISSOR_TEST);
+    // glScissor((float)width / 4, (float)height / 4, (float)width, (float)height);
 
     glClear(GL_COLOR_BUFFER_BIT);
     glClearColor(0.5, 0.5, 0.0, 0);
@@ -83,6 +83,7 @@ void DisplayFunc(void) {
     glLoadIdentity();
 
     /* Perspective view */
+    // glViewport((-1) * width / 6, (-1) * height / 6, width / 2, height / 2);
     glViewport(0, 0, width / 2, height / 2);
     glPushMatrix();
     glTranslatef(0, 0, -10);
