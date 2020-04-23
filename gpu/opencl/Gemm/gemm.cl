@@ -11,7 +11,7 @@ __kernel void gemm(__global float *a,
 	if ((i < n) && (j < n))
 	{	
 		c[i * n + j] *= beta;
-		for(int k=0; k < n; k++)
+		for(int k = 0; k < n; k++)
 		{
 			c[i * n + j] += alpha * a[i * n + k] * b[k * n +j];
 		}
