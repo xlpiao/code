@@ -3,7 +3,6 @@
 COMMIT_MSG_FILE=$(cat "$1")
 
 if [ -n "$COMMIT_MSG_FILE" ]; then
-  # echo "[feat]\n\n$1" > $1
   echo "# Commit message format:" >> $1
   echo "#\tfeat: add new feature" >> $1
   echo "#\tbugfix: fix bugs" >> $1

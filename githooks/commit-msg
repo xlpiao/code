@@ -1,0 +1,10 @@
+#!/bin/sh
+
+REGEX="\[feat\].+|\[bugfix\].+|\[docs\].+|\[style\].+|\[refactor\].+|\[test\].+|\[chore\].+"
+COMMIT_MSG=$(cat $1| grep -Ee $REGEX)
+
+if [ -z "$COMMIT_MSG" ]; then
+  echo "[POLICY] Your message is not formatted correctly"
+  echo "[STANDARD] Your message should be in the format: '[feat] commit message' "
+  exit 1
+fi
