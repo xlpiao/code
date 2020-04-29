@@ -1,0 +1,15 @@
+#!/bin/sh
+
+COMMIT_MSG_FILE=$(cat "$1")
+
+if [ -n "$COMMIT_MSG_FILE" ]; then
+  # echo "[feat]\n\n$1" > $1
+  echo "# Commit message format:" >> $1
+  echo "#\tfeat: add new feature" >> $1
+  echo "#\tbugfix: fix bugs" >> $1
+  echo "#\tdocs: change the documentation" >> $1
+  echo "#\tstyle: format" >> $1
+  echo "#\trefactor: refactor production code" >> $1
+  echo "#\ttest: add missing tests" >> $1
+  echo "#\tchore: update build system and setup files" >> $1
+fi

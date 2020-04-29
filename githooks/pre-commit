@@ -1,0 +1,39 @@
+#!/bin/sh
+
+if git rev-parse --verify HEAD >/dev/null 2>&1
+then
+  against=HEAD
+else
+  # Initial commit: diff against an empty tree object
+  against=$(git hash-object -t tree /dev/null)
+fi
+
+if grep "Conflicts" .git/MERGE_MSG > /dev/null 2>&1
+then
+  echo "Please fix conflicts"
+  echo "Skip hooking..."
+  exit 1
+fi
+
+STYLE=$(git config --get hooks.clangformat.style)
+if [ -n "${STYLE}" ] ; then
+  STYLEARG="-style=${STYLE}"
+else
+  STYLEARG="-style=google"
+fi
+
+format_file() {
+  file="${1}"
+  if [ -f $file ]; then
+    clang-format -i ${STYLEARG} ${1}
+    git add ${1}
+  fi
+}
+
+FILE_TYPE="\.([ch]|[chi](pp|xx)|(cc|hh|ii)|[CHI])$"
+for file in `git diff-index --cached --name-only $against | grep -Ee "$FILE_TYPE"` ; do
+  format_file "${file}"
+done
+
+#check if there are whitespace errors
+exec git diff-index --check --cached $against --
