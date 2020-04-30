@@ -1,10 +1,21 @@
 #!/bin/sh
 
+RED="\033[0;31m"
+GREEN="\033[0;32m"
+CYAN="\033[0;36m"
+RESET="\033[0m"
+
 REGEX="\[feat\].+|\[bugfix\].+|\[docs\].+|\[style\].+|\[refactor\].+|\[test\].+|\[chore\].+"
 COMMIT_MSG=$(cat $1 | sed 's/ *$//g' | grep -Ee $REGEX)
 
 if [ -z "$COMMIT_MSG" ]; then
-  echo "[POLICY] Your message is not formatted correctly"
-  echo "[STANDARD] Your message should be in the format: '[feat] commit message' "
-  exit 1
+  echo "${RED}\nPOLICY!!! Wrong commit message format!!!\nPlease format your commit message as followings:${RESET}"
+  echo "${CYAN}\n[feat] edit your commit msg here...\n...\n${RESET}"
+  echo "${RED}Available commit message format...${RESET}"
+  echo "${GREEN}[feat]${RESET} add new feature"
+  echo "${GREEN}[bugfix]${RESET} fix bugs"
+  echo "${GREEN}[docs]${RESET} change the documentation"
+  echo "${GREEN}[style]${RESET} format source code"
+  echo "${GREEN}[refactor]${RESET} refactor production code"
+  echo "${GREEN}[test]${RESET} add missing tests\n"
 fi
