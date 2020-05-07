@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
-#include <helper_cuda.h>
-#include <helper_functions.h>
+#include "helper_cuda.h"
+#include "helper_functions.h"
 
 #ifndef _RESIZEPIC_KERNEL_H_
 #define _RESIZEPIC_KERNEL_H_
@@ -24,7 +24,7 @@ __global__ void resizePic(float* output,int width, int height)
 
 
 #define TARGET_SIZE 1024
-char* file_name="lena_bw.pgm";
+char* file_name=(char*)"lena_bw.pgm";
 
 int main(int argc, char** argv)
 {
@@ -55,7 +55,7 @@ int main(int argc, char** argv)
     cudaArray* cuArray;
     checkCudaErrors(cudaMallocArray(&cuArray,&channelDesc,width,height));
     checkCudaErrors(cudaMemcpyToArray(cuArray,0,0,h_data,size,cudaMemcpyHostToDevice));
-    
+
     //设置纹理参数
     texRef.addressMode[0]=cudaAddressModeWrap;
     texRef.addressMode[1]=cudaAddressModeWrap;

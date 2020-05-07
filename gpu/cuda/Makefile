@@ -1,10 +1,10 @@
 OS=$(shell uname -s)
 ifeq ($(OS), Linux)
 	SRC=./src/
-	INC=-I/usr/local/cuda/samples/common/inc/
-	LIBPATH_OPENGL=-L../../common/lib/linux/x86_64 -L/usr/X11R6/lib -lGL -lGLU -lX11 -lXi -lXmu -lglut -lGLEW
-	FLAGS=-DDEBUG 
-	DBGFLAGS=-O0 -g -arch sm_13
+	INC=-I./common/
+	LIBPATH_OPENGL=-L./common/lib/linux/x86_64 -L/usr/X11R6/lib -lGL -lGLU -lX11 -lXi -lXmu -lglut -lGLEW
+	FLAGS=-DDEBUG
+	DBGFLAGS=-O0 -g
 endif
 
 all: test cuda_memory_model one_dim multi_dim device_kernel crash crash_debug_0 crash_debug_1 crash_debug_2 resizepic_tex2D atomicAdd grey_sobelfilter_global grey_sobelfilter_local grey_sobelfilter_tex rgba_sobelfilter_global rgba_sobelfilter_local rgba_sobelfilter_tex sobelfilter
@@ -13,7 +13,7 @@ test: $(SRC)test.cu
 	nvcc $(DBGFLAGS) -o bin.test $(SRC)test.cu
 #print_in_kernel: print_in_kernel.cu
 #	nvcc $(DBGFLAGS) -o bin.print_in_kernel print_in_kernel.cu $(INC)
-cuda_memory_model: $(SRC)cuda_memory_model.cu  
+cuda_memory_model: $(SRC)cuda_memory_model.cu
 	nvcc $(DBGFLAGS) -o bin.cuda_memory_model $(SRC)cuda_memory_model.cu
 one_dim: $(SRC)one_dim.cu
 	nvcc $(DBGFLAGS) -o bin.one_dim $(SRC)one_dim.cu
@@ -32,7 +32,7 @@ crash_debug_2: $(SRC)crash_debug_2.cu
 resizepic_tex2D: $(SRC)resizepic_tex2D.cu
 	nvcc $(DBGFLAGS) -o bin.resizepic_tex2D $(SRC)resizepic_tex2D.cu $(INC)
 atomicAdd: $(SRC)atomicAdd.cu
-	nvcc $(DBGFLAGS) -o bin.atomicAdd $(SRC)atomicAdd.cu 
+	nvcc $(DBGFLAGS) -o bin.atomicAdd $(SRC)atomicAdd.cu
 grey_sobelfilter_global: $(SRC)grey_sobelfilter_global.cu
 	nvcc $(DBGFLAGS) -o bin.grey_sobelfilter_global $(SRC)grey_sobelfilter_global.cu $(INC)
 grey_sobelfilter_local: $(SRC)grey_sobelfilter_local.cu
