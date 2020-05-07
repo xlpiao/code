@@ -7,7 +7,7 @@ ifeq ($(OS), Linux)
 	DBGFLAGS=-O0 -g
 endif
 
-all: test cuda_memory_model one_dim multi_dim device_kernel crash crash_debug_0 crash_debug_1 crash_debug_2 resizepic_tex2D atomicAdd grey_sobelfilter_global grey_sobelfilter_local grey_sobelfilter_tex rgba_sobelfilter_global rgba_sobelfilter_local rgba_sobelfilter_tex sobelfilter
+all: test cuda_memory_model one_dim multi_dim device_kernel crash crash_debug_0 crash_debug_1 crash_debug_2 resizepic_tex2D atomic_add grey_sobelfilter_global grey_sobelfilter_local grey_sobelfilter_tex rgba_sobelfilter_global rgba_sobelfilter_local rgba_sobelfilter_tex sobelfilter
 
 test: $(SRC)test.cu
 	nvcc $(DBGFLAGS) -o bin.test $(SRC)test.cu
@@ -31,8 +31,8 @@ crash_debug_2: $(SRC)crash_debug_2.cu
 	nvcc $(DBGFLAGS) $(FLAGS) -o bin.crash_debug_2 $(SRC)crash_debug_2.cu
 resizepic_tex2D: $(SRC)resizepic_tex2D.cu
 	nvcc $(DBGFLAGS) -o bin.resizepic_tex2D $(SRC)resizepic_tex2D.cu $(INC)
-atomicAdd: $(SRC)atomicAdd.cu
-	nvcc $(DBGFLAGS) -o bin.atomicAdd $(SRC)atomicAdd.cu
+atomic_add: $(SRC)atomic_add.cu
+	nvcc $(DBGFLAGS) -o bin.atomic_add $(SRC)atomic_add.cu
 grey_sobelfilter_global: $(SRC)grey_sobelfilter_global.cu
 	nvcc $(DBGFLAGS) -o bin.grey_sobelfilter_global $(SRC)grey_sobelfilter_global.cu $(INC)
 grey_sobelfilter_local: $(SRC)grey_sobelfilter_local.cu
