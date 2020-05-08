@@ -16,7 +16,6 @@
 
 #include <chrono>
 #include <cmath>
-#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -90,8 +89,8 @@ void computeInDevice(cl_device_id &device_id) {
   err = clEnqueueWriteBuffer(cmd_queue, d_y, CL_TRUE, 0, sizeof(float) * N * N,
                              h_y, 0, NULL, NULL);
 
-  std::filesystem::path file_path(__FILE__);
-  auto kernel_path = std::string(file_path.parent_path()).append("/saxpy.cl");
+  std::string::size_type pos = std::string(__FILE__).find_last_of("\\/");
+  auto kernel_path = std::string(__FILE__).substr(0, pos).append("/saxpy.cl");
   // std::cout << kernel_path << std::endl;
   std::ifstream file(kernel_path);
 

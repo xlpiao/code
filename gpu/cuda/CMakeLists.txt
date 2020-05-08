@@ -16,8 +16,10 @@ message(STATUS "INFO ${CUDA_LIBRARY}")
 ## library
 if(APPLE)
   message(STATUS "INFO APPLE")
-elseif(LINUX)
+  set(LIBS "-framework OpenCL")
+else()
   message(STATUS "INFO LINUX")
+  set(LIBS "OpenCL -lpthread")
 endif()
 
 ## build options
@@ -27,8 +29,9 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Debug)
 endif(NOT CMAKE_BUILD_TYPE)
 
-## binary
+## internal header
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/common)
 
+## binary
 add_executable(bin.atomic_add ${CMAKE_CURRENT_SOURCE_DIR}/src/atomic_add.cu)
 target_link_libraries(bin.atomic_add)
