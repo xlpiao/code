@@ -17,7 +17,6 @@
 
 #include <chrono>
 #include <cmath>
-#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -123,12 +122,14 @@ void computeInDevice(cl_device_id &device_id) {
       clEnqueueWriteBuffer(cmd_queue, out_parallel_mem, CL_TRUE, 0,
                            sizeof(float) * N * N, out_parallel, 0, NULL, NULL);
 
-  auto pwd = std::filesystem::current_path();
-  std::ifstream file(pwd.append("../Gemm/gemm.cl"));
+  std::string::size_type pos = std::string(__FILE__).find_last_of("\\/");
+  auto kernel_path = std::string(__FILE__).substr(0, pos).append("/gemm.cl");
+  // std::cout << kernel_path << std::endl;
+  std::ifstream file(kernel_path);
+
   std::ostringstream out;
   out << file.rdbuf();
   std::string kernel_src = out.str();
-
   auto kernel_str = (char *)kernel_src.c_str();
   auto kernel_str_size = kernel_src.size();
   // std::cout << kernel_str << std::endl;

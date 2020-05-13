@@ -1,5 +1,5 @@
 project(OPENCL)
-cmake_minimum_required(VERSION 3.12.0)
+cmake_minimum_required(VERSION 3.10)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -15,9 +15,9 @@ message(STATUS "INFO ${OpenCL_LIBRARY}")
 if(APPLE)
   message(STATUS "INFO APPLE")
   set(LIBS "-framework OpenCL")
-elseif(LINUX)
+else()
   message(STATUS "INFO LINUX")
-  set(LIBS "OpenCL")
+  set(LIBS "OpenCL -lpthread")
 endif()
 
 ## build options
@@ -27,9 +27,10 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Debug)
 endif(NOT CMAKE_BUILD_TYPE)
 
-## binary
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}) # util.h
+## internal header
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/common)
 
+## binary
 add_executable(bin.QueryInfo ${CMAKE_CURRENT_SOURCE_DIR}/QueryInfo/main.cc)
 target_link_libraries(bin.QueryInfo ${LIBS})
 
