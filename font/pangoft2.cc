@@ -1,10 +1,8 @@
-#include <iostream>
-
 #include <pango/pangoft2.h>
 
-#include "ftdump.h"
+#include <iostream>
 
-typedef struct FT_FaceRec_* FT_Face;
+#include "ftdump.h"
 
 int main(void) {
   std::string text = "a가나bb@fff다라마바사";
@@ -45,10 +43,11 @@ int main(void) {
     FT_Face face =
         pango_fc_font_lock_face(PANGO_FC_FONT(p_item->analysis.font));
     if (face) {
+      std::cout << "Read info from FT_Face: " << std::endl;
+      Print_Name(face);
+      Print_Fixed(face);
+      Print_Sfnt_Tables(face);
       // Print_Charmaps(face);
-      // Print_Fixed(face);
-      // Print_Name(face);
-      // Print_Sfnt_Tables(face);
       // Print_Programs(face);
     } else {
       pango_fc_font_unlock_face(PANGO_FC_FONT(p_item->analysis.font));
