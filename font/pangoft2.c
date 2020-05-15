@@ -1,20 +1,8 @@
 #include <pango/pangoft2.h>
 
+#include "ftdump.h"
+
 typedef struct FT_FaceRec_* FT_Face;
-
-static void printName(FT_Face face) {
-  const char* ps_name;
-
-  printf("Font Name Entries\n");
-  printf("\tfamily:\t\t%s\n", face->family_name);
-  printf("\tstyle:\t\t%s\n", face->style_name);
-
-  ps_name = FT_Get_Postscript_Name(face);
-  if (ps_name == NULL)
-    ps_name = "UNAVAILABLE";
-
-  printf("\tpostscript:\t%s\n\n", ps_name);
-}
 
 int main(void) {
   char text[] = "a가나bb@fff다라마바사";
@@ -39,13 +27,24 @@ int main(void) {
     printf("Offset: %d\n", p_item->offset);
     printf("Lang: %s\n", pango_language_to_string(p_item->analysis.language));
 
+    PangoFontDescription* font_desc =
+        pango_font_describe(p_item->analysis.font);
+    char* font_name = (char*)(pango_font_description_get_family(font_desc));
+    int font_style = (int)(pango_font_description_get_style(font_desc));
+    int font_size = PANGO_PIXELS(pango_font_description_get_size(font_desc));
+    printf("name: %s, style: %d, size: %d\n", font_name, font_style, font_size);
+
     //// check: pango_ft2_font_get_face is deprecated
     // FT_Face face = pango_ft2_font_get_face(p_item->analysis.font);
     //// check: pango_fc_font_lock_face is deprecated after 1.44
     FT_Face face =
         pango_fc_font_lock_face(PANGO_FC_FONT(p_item->analysis.font));
     if (face) {
-      printName(face);
+      // Print_Charmaps(face);
+      Print_Fixed(face);
+      Print_Name(face);
+      Print_Sfnt_Tables(face);
+      // Print_Programs(face);
     } else {
       pango_fc_font_unlock_face(PANGO_FC_FONT(p_item->analysis.font));
     }
