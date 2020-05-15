@@ -50,8 +50,29 @@ int main(void) {
     }
 
     //// pango shape
-    PangoGlyphString* glyphs = pango_glyph_string_new();
-    pango_shape(text, len, &(p_item->analysis), glyphs);
+    PangoGlyphString* glyph_string = pango_glyph_string_new();
+    pango_shape(text, len, &(p_item->analysis), glyph_string);
+
+    for (int index = 0; index < glyph_string->num_glyphs; ++index) {
+      PangoGlyphInfo* glyph_info = &glyph_string->glyphs[index];
+
+      int glyph_id = glyph_info->glyph;
+
+      int x_advance = PANGO_PIXELS(glyph_info->geometry.width);
+
+      PangoFontMetrics* metrics = pango_font_get_metrics(
+          p_item->analysis.font, p_item->analysis.language);
+      int y_advance = PANGO_PIXELS(pango_font_metrics_get_ascent(metrics) +
+                                   pango_font_metrics_get_descent(metrics));
+
+      int x_offset = glyph_info->geometry.x_offset;
+      int y_offset = glyph_info->geometry.y_offset;
+
+      printf(
+          "glyph_id: %-6d, x_advance: %-6d, y_advance: %-6d, x_offset: %-6d, "
+          "y_offset: %-6d\n",
+          glyph_id, x_advance, y_advance, x_offset, y_offset);
+    }
 
     //// draw glyph
     // draw text with drawing api ...
