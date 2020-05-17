@@ -37,3 +37,4 @@ add_executable(bin.atomic_add ${CMAKE_CURRENT_SOURCE_DIR}/src/test/atomic_add.cu
 # target_link_libraries(bin.atomic_add)
 
 add_executable(bin.08_index ${CMAKE_CURRENT_SOURCE_DIR}/src/masterclass/08_index.cu)
+add_executable(bin.dim ${CMAKE_CURRENT_SOURCE_DIR}/src/masterclass/dim.cu)
