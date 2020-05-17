@@ -31,14 +31,14 @@ endif(NOT CMAKE_BUILD_TYPE)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/common)
 
 ## binary
-add_executable(bin.QueryInfo ${CMAKE_CURRENT_SOURCE_DIR}/QueryInfo/main.cc)
-target_link_libraries(bin.QueryInfo ${LIBS})
+add_executable(bin.query_info ${CMAKE_CURRENT_SOURCE_DIR}/src/query_info/main.cc)
+target_link_libraries(bin.query_info ${LIBS})
 
-add_executable(bin.Gemm ${CMAKE_CURRENT_SOURCE_DIR}/Gemm/main.cc)
-target_link_libraries(bin.Gemm ${LIBS})
+add_executable(bin.gemm ${CMAKE_CURRENT_SOURCE_DIR}/src/gemm/main.cc)
+target_link_libraries(bin.gemm ${LIBS})
 
-add_executable(bin.MultiQueue ${CMAKE_CURRENT_SOURCE_DIR}/MultiQueue/main.cc)
-target_link_libraries(bin.MultiQueue ${LIBS})
+add_executable(bin.multi_queue ${CMAKE_CURRENT_SOURCE_DIR}/src/multi_queue/main.cc)
+target_link_libraries(bin.multi_queue ${LIBS})
 
-add_executable(bin.Saxpy ${CMAKE_CURRENT_SOURCE_DIR}/Saxpy/main.cc)
-target_link_libraries(bin.Saxpy ${LIBS})
+add_executable(bin.saxpy ${CMAKE_CURRENT_SOURCE_DIR}/src/saxpy/main.cc)
+target_link_libraries(bin.saxpy ${LIBS})

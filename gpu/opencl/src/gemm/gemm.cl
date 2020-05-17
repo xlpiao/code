@@ -9,7 +9,7 @@ __kernel void gemm(__global float *a,
 	int j = get_global_id(1);
 
 	if ((i < n) && (j < n))
-	{	
+	{
 		c[i * n + j] *= beta;
 		for(int k = 0; k < n; k++)
 		{

@@ -8,7 +8,7 @@ __kernel void saxpy(float alpha,
 	int j = get_global_id(1);
 
 	if ((i < n) && (j < n))
-	{	
+	{
     z[i * n + j] = alpha * x[i * n + j] + y[i * n + j];
 	}
 }
