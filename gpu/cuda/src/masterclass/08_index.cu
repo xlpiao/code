@@ -15,12 +15,24 @@ __global__ void print(int* input) {
 }
 
 __global__ void print_details(int* input) {
+  /*int gid =
+    (threadIdx.z * blockDim.x * blockDim.y) +
+    (threadIdx.y * blockDim.x) +
+    (threadIdx.x) +
+    (blockDim.x * blockDim.y * blockDim.z * blockIdx.x) +
+    (blockDim.x * blockDim.y * blockDim.z * gridDim.x * blockIdx.y) +
+    (blockDim.x * blockDim.y * blockDim.z * gridDim.x * gridDim.y *
+    blockIdx.z);*/
+
   int tid = (threadIdx.z * blockDim.x * blockDim.y) +
             (threadIdx.y * blockDim.x) + threadIdx.x;
   int num_of_thread_in_a_block = blockDim.x * blockDim.y * blockDim.z;
+
   int block_offset = num_of_thread_in_a_block * blockIdx.x;
+
   int num_of_threads_in_a_row = num_of_thread_in_a_block * gridDim.x;
   int row_offset = num_of_threads_in_a_row * blockIdx.y;
+
   int num_of_thread_in_xy = num_of_thread_in_a_block * gridDim.x * gridDim.y;
   int z_offset = num_of_thread_in_xy * blockIdx.z;
 
