@@ -41,3 +41,4 @@ add_executable(bin.08_index ${CMAKE_CURRENT_SOURCE_DIR}/src/masterclass/08_index
 add_executable(bin.dim ${CMAKE_CURRENT_SOURCE_DIR}/src/masterclass/dim.cu)
 add_executable(bin.dim_v1 ${CMAKE_CURRENT_SOURCE_DIR}/src/masterclass/dim_v1.cu)
 add_executable(bin.warp_divergence ${CMAKE_CURRENT_SOURCE_DIR}/src/masterclass/warp_divergence.cu)
+add_executable(bin.reduction ${CMAKE_CURRENT_SOURCE_DIR}/src/masterclass/reduction.cu)
