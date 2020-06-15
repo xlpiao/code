@@ -33,9 +33,9 @@ Array1D Functional::conv1d(Array1D& input, Array1D& filter,
 
   for (int i = 0; i < output.size(); i += 1) {
     for (int k = 0; k < filter.size(); k++) {
-      int offset = i * stride - padding + k;
-      if (offset >= 0 && offset < input.size()) {
-        output[i] += input[offset] * filter[k];
+      int col = i * stride - padding + k;
+      if (col >= 0 && col < input.size()) {
+        output[i] += input[col] * filter[k];
       }
     }
   }
