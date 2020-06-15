@@ -2,19 +2,17 @@
 
 import torch
 import torch.nn.functional as F
-from torch.autograd import Variable
-import numpy as np
 
 input = torch.ones(1, 1, 1, 8)
-filter = torch.ones(1, 1, 1, 5) * 2
-out = F.conv1d(input, filter, stride = 2, padding = 2)
+kernel = torch.ones(1, 1, 1, 5) * 2
+output = F.conv1d(input, kernel, stride = 2, padding = 2)
 print(input)
-print(filter)
-print(out)
+print(kernel)
+print(output)
 
 input = torch.ones(1, 1, 8, 8)
-filter = torch.ones(1, 1, 5, 5) * 2
-out = F.conv2d(input, filter, stride = 2, padding = 2)
+kernel = torch.ones(1, 1, 5, 5) * 2
+output = F.conv2d(input, kernel, stride = 2, padding = 2)
 print(input)
-print(filter)
-print(out)
+print(kernel)
+print(output)
