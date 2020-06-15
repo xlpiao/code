@@ -46,15 +46,24 @@ Array1D Functional::conv1d(Array1D& input, Array1D& filter,
 Array2D Functional::conv2d(Array2D& input, Array2D& filter,
                            const unsigned int stride,
                            const unsigned int padding) {
-  const unsigned int row = input.size();
-  const unsigned int col = input[0].size();
+  const unsigned int row =
+      (input.size() + 2 * padding - filter.size()) / stride + 1;
+  const unsigned int col =
+      (input[0].size() + 2 * padding - filter.size()) / stride + 1;
   Array2D output(row, Array1D(col, 0));
 
   for (int i = 0; i < output.size(); i++) {
     for (int j = 0; j < output[i].size(); j++) {
+      int row_offset = i * stride - padding;
+      int col_offset = j * stride - padding;
       for (int m = 0; m < filter.size(); m++) {
         for (int n = 0; n < filter.size(); n++) {
-          output[i][j] += input[i][j] * filter[m][n];
+          if ((row_offset + m) >= 0 && (col_offset + n) >= 0 &&
+              (row_offset + m) < (int)input.size() &&
+              (col_offset + n) < (int)input[i].size()) {
+            output[i][j] +=
+                input[m + row_offset][n + col_offset] * filter[m][n];
+          }
         }
       }
     }
@@ -98,10 +107,29 @@ int main(void) {
   std::cout << std::endl;
 
   //// 2. 2D array convolution
+  std::cout << "\n--- 2D convolution ---\n" << std::endl;
   Array2D input2(input_size, Array1D(input_size, 1));
   Array2D filter2(filter_size, Array1D(filter_size, 2));
 
-  auto output2 = F.conv2d(input2, filter2);
+  std::cout << "input: " << std::endl;
+  for (int i = 0; i < input2.size(); i++) {
+    for (int j = 0; j < input2[i].size(); j++) {
+      std::cout << input2[i][j] << ", ";
+    }
+    std::cout << std::endl;
+  }
+  std::cout << std::endl;
+
+  std::cout << "filter: " << std::endl;
+  for (int i = 0; i < filter2.size(); i++) {
+    for (int j = 0; j < filter2[i].size(); j++) {
+      std::cout << filter2[i][j] << ", ";
+    }
+    std::cout << std::endl;
+  }
+  std::cout << std::endl;
+
+  auto output2 = F.conv2d(input2, filter2, stride, padding);
   for (int i = 0; i < output2.size(); i++) {
     for (int j = 0; j < output2[i].size(); j++) {
       std::cout << output2[i][j] << ", ";
