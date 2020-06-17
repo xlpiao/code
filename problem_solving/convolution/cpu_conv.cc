@@ -92,6 +92,7 @@ int main(void) {
   const unsigned int kernel_size = 5;
   const unsigned int stride = 2;
   const unsigned int padding = 2;
+  // const unsigned int padding = kernel_size / 2;
 
   //// 1. 1D array convolution
   std::cout << "\n--- 1D convolution ---\n" << std::endl;

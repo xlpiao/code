@@ -6,13 +6,14 @@
  * Last Modified By  : Xianglan Piao <xianglan0502@gmail.com>
  * NOTE:             : cuda convolution (conv1d(), conv2d())
  */
-#include <stdio.h>
+
 #include <iostream>
 
 #define INPUT_SIZE 8
 #define KERNEL_SIZE 5
 #define STRIDE 2
 #define PADDING 2
+// #define PADDING (KERNEL_SIZE / 2)
 #define OUTPUT_SIZE ((INPUT_SIZE + 2 * PADDING - KERNEL_SIZE) / STRIDE + 1)
 
 __constant__ float kernel[KERNEL_SIZE];
