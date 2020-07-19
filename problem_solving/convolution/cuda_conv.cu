@@ -19,7 +19,7 @@
 __constant__ float kernel[KERNEL_SIZE];
 
 //// global memory
-__global__ void conv1d_global(float* input, float* output) {
+__global__ void conv1d_naive(float* input, float* output) {
   int gid = blockIdx.x * blockDim.x + threadIdx.x;
 
   for (int k = 0; k < KERNEL_SIZE; k++) {
@@ -96,7 +96,7 @@ int main(void) {
 
   //// using global memory
   cudaMemset(d_output, 0, OUTPUT_SIZE * sizeof(float));
-  conv1d_global<<<grid_dim, block_dim>>>(d_input, d_output);
+  conv1d_naive<<<grid_dim, block_dim>>>(d_input, d_output);
   cudaDeviceSynchronize();
 
   memset(h_output, 0, OUTPUT_SIZE);
