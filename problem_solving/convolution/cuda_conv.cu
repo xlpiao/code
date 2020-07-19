@@ -20,32 +20,39 @@ __constant__ float kernel[KERNEL_SIZE];
 
 //// global memory
 __global__ void conv1d_naive(float* input, float* output) {
-  int gid = blockIdx.x * blockDim.x + threadIdx.x;
+  int col = blockIdx.x * blockDim.x + threadIdx.x;
 
+  float temp = 0.0f;
   for (int k = 0; k < KERNEL_SIZE; k++) {
-    int col = gid * STRIDE - PADDING + k;
-    if (col >= 0 && col < INPUT_SIZE) {
-      output[gid] += input[col] * kernel[k];
+    int col_offset = col * STRIDE - PADDING + k;
+    if (col_offset >= 0 && col_offset < INPUT_SIZE) {
+      temp += input[col_offset] * kernel[k];
     }
   }
+
+  output[col] = temp;
 }
 
 //// shared memory
 #define BLOCK_SIZE 4
 __global__ void conv1d_shared(float* input, float* output) {
-  int gid = blockIdx.x * blockDim.x + threadIdx.x;
+  int col = blockIdx.x * blockDim.x + threadIdx.x;
 
   __shared__ float shared_block[BLOCK_SIZE];
 
+  float temp = 0.0f;
   for (int k = 0; k < KERNEL_SIZE; k++) {
-    int col = gid * STRIDE - PADDING + k;
+    int col_offset = col * STRIDE - PADDING + k;
 
-    shared_block[threadIdx.x] = input[col];
+    shared_block[threadIdx.x] = input[col_offset];
     __syncthreads();
-    if (col >= 0 && col < INPUT_SIZE) {
-      output[gid] += shared_block[threadIdx.x] * kernel[k];
+
+    if (col_offset >= 0 && col_offset < INPUT_SIZE) {
+      temp += shared_block[threadIdx.x] * kernel[k];
     }
   }
+
+  output[col] = temp;
 }
 
 void initData(float* data, int size, float value) {
@@ -60,6 +67,30 @@ void print1d(float* data, int size) {
   }
   std::cout << std::endl;
 }
+
+//// constant memory
+// __constant__ float kernel2d[KERNEL_SIZE * KERNEL_SIZE];
+
+//// global memory
+// __global__ void conv2d_naive(float* input, float* output) {
+// int col = blockIdx.x * blockDim.x + threadIdx.x;
+// int row = blockIdx.y * blockDim.y + threadIdx.y;
+
+// float temp = 0.0f;
+// for (int m = 0; m < KERNEL_SIZE; m++) {
+// for (int n = 0; n < KERNEL_SIZE; n++) {
+// int col_offset = col * STRIDE - PADDING + m;
+// int row_offset = row * STRIDE - PADDING + n;
+// if ((col_offset >= 0 && col_offset < INPUT_SIZE) &&
+// (row_offset >= 0 && row_offset < INPUT_SIZE)) {
+// temp += input[row_offset * INPUT_SIZE + col_offset] *
+// kernel2d[m * KERNEL_SIZE + n];
+// }
+// }
+
+// output[row * OUTPUT_SIZE + col] = temp;
+// }
+// }
 
 int main(void) {
   dim3 block_dim(0);
