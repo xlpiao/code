@@ -55,42 +55,49 @@ __global__ void conv1d_shared(float* input, float* output) {
   output[col] = temp;
 }
 
-void initData(float* data, int size, float value) {
+void initData(float* data, int size) {
   for (int i = 0; i < size; i++) {
     data[i] = i + 1;
   }
 }
 
-void print1d(float* data, int size) {
-  for (int i = 0; i < size; i++) {
-    std::cout << data[i] << ", ";
+void print(float* data, dim3 dim) {
+  for (int x = 0; x < dim.x; x++) {
+    if (dim.y == 0) {
+      std::cout << data[x] << ",  ";
+    } else {
+      for (int y = 0; y < dim.y; y++) {
+        std::cout << data[x * dim.x + y] << ",  ";
+      }
+      std::cout << std::endl;
+    }
   }
   std::cout << std::endl;
 }
 
 //// constant memory
-// __constant__ float kernel2d[KERNEL_SIZE * KERNEL_SIZE];
+__constant__ float kernel2d[KERNEL_SIZE * KERNEL_SIZE];
 
 //// global memory
-// __global__ void conv2d_naive(float* input, float* output) {
-// int col = blockIdx.x * blockDim.x + threadIdx.x;
-// int row = blockIdx.y * blockDim.y + threadIdx.y;
+__global__ void conv2d_naive(float* input, float* output) {
+  int col = blockIdx.x * blockDim.x + threadIdx.x;
+  int row = blockIdx.y * blockDim.y + threadIdx.y;
 
-// float temp = 0.0f;
-// for (int m = 0; m < KERNEL_SIZE; m++) {
-// for (int n = 0; n < KERNEL_SIZE; n++) {
-// int col_offset = col * STRIDE - PADDING + m;
-// int row_offset = row * STRIDE - PADDING + n;
-// if ((col_offset >= 0 && col_offset < INPUT_SIZE) &&
-// (row_offset >= 0 && row_offset < INPUT_SIZE)) {
-// temp += input[row_offset * INPUT_SIZE + col_offset] *
-// kernel2d[m * KERNEL_SIZE + n];
-// }
-// }
+  float temp = 0.0f;
+  for (int m = 0; m < KERNEL_SIZE; m++) {
+    for (int n = 0; n < KERNEL_SIZE; n++) {
+      int col_offset = col * STRIDE - PADDING + m;
+      int row_offset = row * STRIDE - PADDING + n;
+      if ((col_offset >= 0 && col_offset < INPUT_SIZE) &&
+          (row_offset >= 0 && row_offset < INPUT_SIZE)) {
+        temp += input[row_offset * INPUT_SIZE + col_offset] *
+                kernel2d[m * KERNEL_SIZE + n];
+      }
+    }
 
-// output[row * OUTPUT_SIZE + col] = temp;
-// }
-// }
+    output[row * OUTPUT_SIZE + col] = temp;
+  }
+}
 
 int main(void) {
   dim3 block_dim(0);
@@ -105,8 +112,8 @@ int main(void) {
   std::cout << "\n--- 1D convolution ---\n" << std::endl;
   std::cout << "input: " << std::endl;
   h_input = (float*)malloc(INPUT_SIZE * sizeof(float));
-  initData(h_input, INPUT_SIZE, 1.0);
-  print1d(h_input, INPUT_SIZE);
+  initData(h_input, INPUT_SIZE);
+  print(h_input, dim3(INPUT_SIZE, 0, 0));
   std::cout << std::endl;
 
   cudaMalloc((void**)&d_input, INPUT_SIZE * sizeof(float));
@@ -115,7 +122,7 @@ int main(void) {
 
   float h_kernel[KERNEL_SIZE] = {1, 2, 4, 2, 1};
   std::cout << "kernel: " << std::endl;
-  print1d(h_kernel, KERNEL_SIZE);
+  print(h_kernel, dim3(KERNEL_SIZE, 0, 0));
   std::cout << std::endl;
   cudaMemcpyToSymbol(kernel, &h_kernel, sizeof(kernel));
 
@@ -134,7 +141,7 @@ int main(void) {
   cudaMemcpy(h_output, d_output, OUTPUT_SIZE * sizeof(float),
              cudaMemcpyDeviceToHost);
   std::cout << "output: " << std::endl;
-  print1d(h_output, OUTPUT_SIZE);
+  print(h_output, dim3(OUTPUT_SIZE, 0, 0));
   std::cout << std::endl;
 
   //// using shared memory
@@ -146,32 +153,61 @@ int main(void) {
   cudaMemcpy(h_output, d_output, OUTPUT_SIZE * sizeof(float),
              cudaMemcpyDeviceToHost);
   std::cout << "output: " << std::endl;
-  print1d(h_output, OUTPUT_SIZE);
+  print(h_output, dim3(OUTPUT_SIZE, 0, 0));
   std::cout << std::endl;
 
+  //// free
   cudaFree(d_input);
   cudaFree(d_output);
   free(h_input);
   free(h_output);
 
   //// 2D convolution
-  // printf("\nprint 2D:\n");
-  // h_input = (float*)calloc(INPUT_SIZE * size.y, sizeof(float));
-  // initInput(h_input, INPUT_SIZE * size.y);
-  // cudaMalloc((void**)&input, INPUT_SIZE * size.y * sizeof(float));
-  // cudaMemcpy(input, h_input, INPUT_SIZE * size.y * sizeof(float),
-  // cudaMemcpyHostToDevice);
+  std::cout << "\n--- 2D convolution ---\n" << std::endl;
+  h_input = (float*)calloc(INPUT_SIZE * INPUT_SIZE, sizeof(float));
+  initData(h_input, INPUT_SIZE * INPUT_SIZE);
+  std::cout << "input: " << std::endl;
+  print(h_input, dim3(INPUT_SIZE, INPUT_SIZE, 0));
+  std::cout << std::endl;
 
-  // block_dim.y = 4;
-  // grid_dim.y = size.y / block_dim.y;
+  cudaMalloc((void**)&d_input, INPUT_SIZE * INPUT_SIZE * sizeof(float));
+  cudaMemcpy(d_input, h_input, INPUT_SIZE * INPUT_SIZE * sizeof(float),
+             cudaMemcpyHostToDevice);
 
-  // print2D<<<grid_dim, block_dim>>>(d_input);
-  // cudaDeviceSynchronize();
+  float h_kernel2d[KERNEL_SIZE * KERNEL_SIZE] = {1, 1, 1, 1, 1,   //
+                                                 1, 2, 2, 2, 1,   //
+                                                 1, 2, 4, 2, 1,   //
+                                                 1, 2, 2, 2, 1,   //
+                                                 1, 1, 1, 1, 1};  //
+  std::cout << "kernel: " << std::endl;
+  print(h_kernel2d, dim3(KERNEL_SIZE, KERNEL_SIZE, 0));
+  std::cout << std::endl;
+  cudaMemcpyToSymbol(kernel2d, &h_kernel2d, sizeof(kernel2d));
 
-  // cudaMemcpy(h_input, d_input, INPUT_SIZE * size.y * sizeof(float),
-  // cudaMemcpyDeviceToHost);
-  // cudaFree(d_input);
-  // free(h_input);
+  block_dim.x = BLOCK_SIZE;
+  block_dim.y = BLOCK_SIZE;
+  grid_dim.x = OUTPUT_SIZE / block_dim.x;
+  grid_dim.y = OUTPUT_SIZE / block_dim.y;
+
+  cudaMalloc((void**)&d_output, OUTPUT_SIZE * OUTPUT_SIZE * sizeof(float));
+  h_output = (float*)calloc(OUTPUT_SIZE * OUTPUT_SIZE, sizeof(float));
+  cudaMemset(d_output, 0, OUTPUT_SIZE * OUTPUT_SIZE * sizeof(float));
+
+  conv2d_naive<<<grid_dim, block_dim>>>(d_input, d_output);
+  cudaDeviceSynchronize();
+
+  memset(h_output, 0, OUTPUT_SIZE * OUTPUT_SIZE);
+  cudaMemcpy(h_output, d_output, OUTPUT_SIZE * OUTPUT_SIZE * sizeof(float),
+             cudaMemcpyDeviceToHost);
+  std::cout << "output: " << std::endl;
+  print(h_output, dim3(OUTPUT_SIZE, OUTPUT_SIZE, 0));
+  std::cout << std::endl;
+
+  //// free
+  cudaFree(d_input);
+  cudaFree(d_output);
+  free(h_input);
+  free(h_output);
 
   //// reset
   cudaDeviceReset();
