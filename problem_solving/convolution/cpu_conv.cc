@@ -7,8 +7,8 @@
  */
 
 /* NOTE: convolutional output size */
-/* output_size = (intput_size + 2 * padding - kernel_size) / stride + 1 */
-/* input_index = output_index * stride - padding + kernel_index */
+/* output_size = (input_size + 2 * padding - kernel_size) / stride + 1 */
+/* input_index = (output_index * stride - padding) + kernel_index * dilation */
 
 #include <iostream>
 #include <vector>
@@ -125,7 +125,8 @@ Array3D Functional::conv3d(Array3D& input,
   return output;
 }
 
-void print1d(const Array1D& data) {
+void print1d(const Array1D& data, const std::string& name) {
+  std::cout << name << std::endl;
   for (auto it : data) {
     std::cout << it << ", ";
   }
@@ -133,7 +134,8 @@ void print1d(const Array1D& data) {
   std::cout << std::endl;
 }
 
-void print2d(const Array2D& data) {
+void print2d(const Array2D& data, const std::string& name) {
+  std::cout << name << std::endl;
   for (int i = 0; i < data.size(); i++) {
     for (int j = 0; j < data[i].size(); j++) {
       std::cout << data[i][j] << ", ";
@@ -143,7 +145,8 @@ void print2d(const Array2D& data) {
   std::cout << std::endl;
 }
 
-void print3d(const Array3D& data) {
+void print3d(const Array3D& data, const std::string& name) {
+  std::cout << name << std::endl;
   for (int i = 0; i < data.size(); i++) {
     for (int j = 0; j < data[i].size(); j++) {
       for (int k = 0; k < data[i][j].size(); k++) {
@@ -169,38 +172,28 @@ int main(void) {
   std::cout << "\n--- 1D convolution ---\n" << std::endl;
   Array1D input1(input_size, 1);
   Array1D kernel1(kernel_size, 2);
-
-  std::cout << "input: " << std::endl;
-  print1d(input1);
-
-  std::cout << "kernel: " << std::endl;
-  print1d(kernel1);
-
-  std::cout << "output: " << std::endl;
   auto output1 = F.conv1d(input1, kernel1, stride, padding, dilation);
-  print1d(output1);
+  print1d(input1, "input");
+  print1d(kernel1, "kernel");
+  print1d(output1, "output");
 
   //// 2. 2D array convolution
   std::cout << "\n--- 2D convolution ---\n" << std::endl;
   Array2D input2(input_size, Array1D(input_size, 1));
   Array2D kernel2(kernel_size, Array1D(kernel_size, 2));
-
-  std::cout << "input: " << std::endl;
-  print2d(input2);
-
-  std::cout << "kernel: " << std::endl;
-  print2d(kernel2);
-
-  std::cout << "output: " << std::endl;
   auto output2 = F.conv2d(input2, kernel2, stride, padding, dilation);
-  print2d(output2);
+  print2d(input2, "input");
+  print2d(kernel2, "kernel");
+  print2d(output2, "output");
 
   //// 3. 3D array convolution
   std::cout << "\n--- 3D convolution ---\n" << std::endl;
   Array3D input3(input_size, Array2D(input_size, Array1D(input_size, 1)));
   Array3D kernel3(kernel_size, Array2D(kernel_size, Array1D(kernel_size, 2)));
   auto output3 = F.conv3d(input3, kernel3, stride, padding, dilation);
-  print3d(output3);
+  print3d(input3, "input");
+  print3d(kernel3, "kernel");
+  print3d(output3, "output");
 
   return 0;
 }
