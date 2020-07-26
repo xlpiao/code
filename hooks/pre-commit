@@ -15,12 +15,13 @@ then
   exit 1
 fi
 
-STYLE=$(git config --get hooks.clangformat.style)
-if [ -n "${STYLE}" ] ; then
-  STYLEARG="-style=${STYLE}"
-else
-  STYLEARG="-style=google"
-fi
+# STYLE=$(git config --get hooks.clangformat.style)
+# if [ -n "${STYLE}" ] ; then
+  # STYLEARG="-style=${STYLE}"
+# else
+  # STYLEARG="-style=google"
+# fi
+STYLEARG="-style={BasedOnStyle: google, AccessModifierOffset: -2, BinPackArguments: false, BinPackParameters: false}"
 
 format_file() {
   file="${1}"
