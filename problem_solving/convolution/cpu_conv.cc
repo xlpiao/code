@@ -16,11 +16,17 @@
 using Array1D = std::vector<float>;
 using Array2D = std::vector<Array1D>;
 using Array3D = std::vector<Array2D>;
+using Array4D = std::vector<Array3D>;
 
 class Functional {
 public:
   Array1D conv1d(Array1D& ifm,
                  Array1D& wgt,
+                 unsigned int stride = 1,
+                 unsigned int padding = 0,
+                 unsigned int dilation = 1);
+  Array4D conv1d(Array4D& ifm,
+                 Array4D& wgt,
                  unsigned int stride = 1,
                  unsigned int padding = 0,
                  unsigned int dilation = 1);
@@ -50,6 +56,28 @@ Array1D Functional::conv1d(Array1D& ifm,
       int ifm_x = (ofm_x * stride - padding) + wgt_x * dilation;
       if (ifm_x >= 0 && ifm_x < ifm.size()) {
         ofm[ofm_x] += ifm[ifm_x] * wgt[wgt_x];
+      }
+    }
+  }
+
+  return ofm;
+}
+
+Array4D Functional::conv1d(Array4D& ifm,
+                           Array4D& wgt,
+                           unsigned int stride,
+                           unsigned int padding,
+                           unsigned int dilation) {
+  unsigned int width =
+      (ifm[0][0][0].size() + 2 * padding - wgt[0][0][0].size()) / stride + 1;
+
+  Array4D ofm{Array4D(1, Array3D(1, Array2D(1, Array1D(width, 0.0f))))};
+
+  for (int ofm_x = 0; ofm_x < ofm[0][0][0].size(); ofm_x++) {
+    for (int wgt_x = 0; wgt_x < wgt[0][0][0].size(); wgt_x++) {
+      int ifm_x = (ofm_x * stride - padding) + wgt_x * dilation;
+      if (ifm_x >= 0 && ifm_x < ifm[0][0][0].size()) {
+        ofm[0][0][0][ofm_x] += ifm[0][0][0][ifm_x] * wgt[0][0][0][wgt_x];
       }
     }
   }
@@ -156,6 +184,23 @@ void print3d(const Array3D& data, const std::string& name) {
   std::cout << std::endl;
 }
 
+void print(const Array4D& data, const std::string& name) {
+  std::cout << name << std::endl;
+  for (int z = 0; z < data.size(); z++) {
+    for (int y = 0; y < data[z].size(); y++) {
+      for (int x = 0; x < data[z][y].size(); x++) {
+        for (int i = 0; i < data[0][0][0].size(); i++) {
+          std::cout << data[0][0][0][i] << ", ";
+        }
+        std::cout << std::endl;
+      }
+      std::cout << std::endl;
+    }
+    std::cout << std::endl;
+  }
+  std::cout << std::endl;
+}
+
 int main(void) {
   Functional F;
   unsigned int ifm_size = 8;
@@ -173,6 +218,13 @@ int main(void) {
   print1d(ifm1, "input");
   print1d(wgt1, "kernel/weight/mask/filter");
   print1d(ofm1, "output");
+
+  Array4D ifm11{Array4D(1, Array3D(1, Array2D(1, Array1D(ifm_size, 1))))};
+  Array4D wgt11{Array4D(1, Array3D(1, Array2D(1, Array1D(wgt_size, 2))))};
+  auto ofm11 = F.conv1d(ifm11, wgt11, stride, padding, dilation);
+  print(ifm11, "input");
+  print(wgt11, "kernel/weight/mask/filter");
+  print(ofm11, "output");
 
   //// 2. 2D convolution
   std::cout << "\n--- 2D convolution ---\n" << std::endl;
