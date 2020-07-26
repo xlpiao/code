@@ -75,8 +75,8 @@ Array2D Functional::conv2d(Array2D& input,
         for (int n = 0; n < kernel.size(); n++) {
           int row = (i * stride - padding) + m * dilation;
           int col = (j * stride - padding) + n * dilation;
-          if (row >= 0 && row < input.size() && col >= 0 &&
-              col < input[i].size()) {
+          if ((row >= 0 && row < input.size()) &&
+              (col >= 0 && col < input[i].size())) {
             output[i][j] += input[row][col] * kernel[m][n];
           }
         }
@@ -110,9 +110,9 @@ Array3D Functional::conv3d(Array3D& input,
               int row = (i * stride - padding) + m * dilation;
               int col = (j * stride - padding) + n * dilation;
               int depth = (k * stride - padding) + l * dilation;
-              if (row >= 0 && row < input.size() && col >= 0 &&
-                  col < input[i].size() && depth >= 0 &&
-                  depth < input[i][j].size()) {
+              if ((row >= 0 && row < input.size()) &&
+                  (col >= 0 && col < input[i].size()) &&
+                  (depth >= 0 && depth < input[i][j].size())) {
                 output[i][j][k] += input[row][col][depth] * kernel[m][n][l];
               }
             }
