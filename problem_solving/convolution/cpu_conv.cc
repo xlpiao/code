@@ -18,17 +18,29 @@ using Array2D = std::vector<Array1D>;
 using Array3D = std::vector<Array2D>;
 
 class Functional {
- public:
-  Array1D conv1d(Array1D& input, Array1D& kernel, unsigned int stride = 1,
-                 unsigned int padding = 0, unsigned int dilation = 1);
-  Array2D conv2d(Array2D& input, Array2D& kernel, unsigned int stride = 1,
-                 unsigned int padding = 0, unsigned int dilation = 1);
-  Array3D conv3d(Array3D& input, Array3D& kernel, unsigned int stride = 1,
-                 unsigned int padding = 0, unsigned int dilation = 1);
+public:
+  Array1D conv1d(Array1D& input,
+                 Array1D& kernel,
+                 unsigned int stride = 1,
+                 unsigned int padding = 0,
+                 unsigned int dilation = 1);
+  Array2D conv2d(Array2D& input,
+                 Array2D& kernel,
+                 unsigned int stride = 1,
+                 unsigned int padding = 0,
+                 unsigned int dilation = 1);
+  Array3D conv3d(Array3D& input,
+                 Array3D& kernel,
+                 unsigned int stride = 1,
+                 unsigned int padding = 0,
+                 unsigned int dilation = 1);
 };
 
-Array1D Functional::conv1d(Array1D& input, Array1D& kernel, unsigned int stride,
-                           unsigned int padding, unsigned int dilation) {
+Array1D Functional::conv1d(Array1D& input,
+                           Array1D& kernel,
+                           unsigned int stride,
+                           unsigned int padding,
+                           unsigned int dilation) {
   unsigned int size = (input.size() + 2 * padding - kernel.size()) / stride + 1;
 
   Array1D output(size, 0);
@@ -45,8 +57,11 @@ Array1D Functional::conv1d(Array1D& input, Array1D& kernel, unsigned int stride,
   return output;
 }
 
-Array2D Functional::conv2d(Array2D& input, Array2D& kernel, unsigned int stride,
-                           unsigned int padding, unsigned int dilation) {
+Array2D Functional::conv2d(Array2D& input,
+                           Array2D& kernel,
+                           unsigned int stride,
+                           unsigned int padding,
+                           unsigned int dilation) {
   unsigned int row_size =
       (input.size() + 2 * padding - kernel.size()) / stride + 1;
   unsigned int col_size =
@@ -72,8 +87,11 @@ Array2D Functional::conv2d(Array2D& input, Array2D& kernel, unsigned int stride,
   return output;
 }
 
-Array3D Functional::conv3d(Array3D& input, Array3D& kernel, unsigned int stride,
-                           unsigned int padding, unsigned int dilation) {
+Array3D Functional::conv3d(Array3D& input,
+                           Array3D& kernel,
+                           unsigned int stride,
+                           unsigned int padding,
+                           unsigned int dilation) {
   unsigned int row_size =
       (input.size() + 2 * padding - kernel.size()) / stride + 1;
   unsigned int col_size =
