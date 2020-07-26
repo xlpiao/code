@@ -19,101 +19,98 @@ using Array3D = std::vector<Array2D>;
 
 class Functional {
 public:
-  Array1D conv1d(Array1D& input,
-                 Array1D& kernel,
+  Array1D conv1d(Array1D& ifm,
+                 Array1D& wgt,
                  unsigned int stride = 1,
                  unsigned int padding = 0,
                  unsigned int dilation = 1);
-  Array2D conv2d(Array2D& input,
-                 Array2D& kernel,
+  Array2D conv2d(Array2D& ifm,
+                 Array2D& wgt,
                  unsigned int stride = 1,
                  unsigned int padding = 0,
                  unsigned int dilation = 1);
-  Array3D conv3d(Array3D& input,
-                 Array3D& kernel,
+  Array3D conv3d(Array3D& ifm,
+                 Array3D& wgt,
                  unsigned int stride = 1,
                  unsigned int padding = 0,
                  unsigned int dilation = 1);
 };
 
-Array1D Functional::conv1d(Array1D& input,
-                           Array1D& kernel,
+Array1D Functional::conv1d(Array1D& ifm,
+                           Array1D& wgt,
                            unsigned int stride,
                            unsigned int padding,
                            unsigned int dilation) {
-  unsigned int size = (input.size() + 2 * padding - kernel.size()) / stride + 1;
+  unsigned int width = (ifm.size() + 2 * padding - wgt.size()) / stride + 1;
 
-  Array1D output(size, 0);
+  Array1D ofm(width, 0);
 
-  for (int i = 0; i < output.size(); i += 1) {
-    for (int k = 0; k < kernel.size(); k++) {
-      int col = (i * stride - padding) + k * dilation;
-      if (col >= 0 && col < input.size()) {
-        output[i] += input[col] * kernel[k];
+  for (int ofm_x = 0; ofm_x < ofm.size(); ofm_x++) {
+    for (int wgt_x = 0; wgt_x < wgt.size(); wgt_x++) {
+      int ifm_x = (ofm_x * stride - padding) + wgt_x * dilation;
+      if (ifm_x >= 0 && ifm_x < ifm.size()) {
+        ofm[ofm_x] += ifm[ifm_x] * wgt[wgt_x];
       }
     }
   }
 
-  return output;
+  return ofm;
 }
 
-Array2D Functional::conv2d(Array2D& input,
-                           Array2D& kernel,
+Array2D Functional::conv2d(Array2D& ifm,
+                           Array2D& wgt,
                            unsigned int stride,
                            unsigned int padding,
                            unsigned int dilation) {
-  unsigned int row_size =
-      (input.size() + 2 * padding - kernel.size()) / stride + 1;
-  unsigned int col_size =
-      (input[0].size() + 2 * padding - kernel.size()) / stride + 1;
+  unsigned int height = (ifm.size() + 2 * padding - wgt.size()) / stride + 1;
+  unsigned int width = (ifm[0].size() + 2 * padding - wgt.size()) / stride + 1;
 
-  Array2D output(row_size, Array1D(col_size, 0));
+  Array2D ofm(height, Array1D(width, 0));
 
-  for (int i = 0; i < output.size(); i++) {
-    for (int j = 0; j < output[i].size(); j++) {
-      for (int m = 0; m < kernel.size(); m++) {
-        for (int n = 0; n < kernel.size(); n++) {
-          int row = (i * stride - padding) + m * dilation;
-          int col = (j * stride - padding) + n * dilation;
-          if ((row >= 0 && row < input.size()) &&
-              (col >= 0 && col < input[i].size())) {
-            output[i][j] += input[row][col] * kernel[m][n];
+  for (int ofm_y = 0; ofm_y < ofm.size(); ofm_y++) {
+    for (int ofm_x = 0; ofm_x < ofm[ofm_y].size(); ofm_x++) {
+      for (int wgt_y = 0; wgt_y < wgt.size(); wgt_y++) {
+        for (int wgt_x = 0; wgt_x < wgt.size(); wgt_x++) {
+          int ifm_y = (ofm_y * stride - padding) + wgt_y * dilation;
+          int ifm_x = (ofm_x * stride - padding) + wgt_x * dilation;
+          if ((ifm_y >= 0 && ifm_y < ifm.size()) &&
+              (ifm_x >= 0 && ifm_x < ifm[ofm_y].size())) {
+            ofm[ofm_y][ofm_x] += ifm[ifm_y][ifm_x] * wgt[wgt_y][wgt_x];
           }
         }
       }
     }
   }
 
-  return output;
+  return ofm;
 }
 
-Array3D Functional::conv3d(Array3D& input,
-                           Array3D& kernel,
+Array3D Functional::conv3d(Array3D& ifm,
+                           Array3D& wgt,
                            unsigned int stride,
                            unsigned int padding,
                            unsigned int dilation) {
-  unsigned int row_size =
-      (input.size() + 2 * padding - kernel.size()) / stride + 1;
-  unsigned int col_size =
-      (input[0].size() + 2 * padding - kernel.size()) / stride + 1;
-  unsigned int depth_size =
-      (input[0][0].size() + 2 * padding - kernel.size()) / stride + 1;
+  unsigned int depth = (ifm.size() + 2 * padding - wgt.size()) / stride + 1;
+  unsigned int height = (ifm[0].size() + 2 * padding - wgt.size()) / stride + 1;
+  unsigned int width =
+      (ifm[0][0].size() + 2 * padding - wgt.size()) / stride + 1;
 
-  Array3D output(row_size, Array2D(col_size, Array1D(depth_size, 0)));
+  Array3D ofm(depth, Array2D(height, Array1D(width, 0)));
 
-  for (int i = 0; i < output.size(); i++) {
-    for (int j = 0; j < output[i].size(); j++) {
-      for (int k = 0; k < output[i][j].size(); k++) {
-        for (int m = 0; m < kernel.size(); m++) {
-          for (int n = 0; n < kernel.size(); n++) {
-            for (int l = 0; l < kernel.size(); l++) {
-              int row = (i * stride - padding) + m * dilation;
-              int col = (j * stride - padding) + n * dilation;
-              int depth = (k * stride - padding) + l * dilation;
-              if ((row >= 0 && row < input.size()) &&
-                  (col >= 0 && col < input[i].size()) &&
-                  (depth >= 0 && depth < input[i][j].size())) {
-                output[i][j][k] += input[row][col][depth] * kernel[m][n][l];
+  for (int ofm_z = 0; ofm_z < ofm.size(); ofm_z++) {
+    for (int ofm_y = 0; ofm_y < ofm[ofm_z].size(); ofm_y++) {
+      for (int ofm_x = 0; ofm_x < ofm[ofm_z][ofm_y].size(); ofm_x++) {
+        for (int wgt_z = 0; wgt_z < wgt.size(); wgt_z++) {
+          for (int wgt_y = 0; wgt_y < wgt.size(); wgt_y++) {
+            for (int wgt_x = 0; wgt_x < wgt.size(); wgt_x++) {
+              int ifm_z = (ofm_z * stride - padding) + wgt_z * dilation;
+              int ifm_y = (ofm_y * stride - padding) + wgt_y * dilation;
+              int ifm_x = (ofm_x * stride - padding) + wgt_x * dilation;
+              if ((ifm_z >= 0 && ifm_z < ifm.size()) &&
+                  (ifm_y >= 0 && ifm_y < ifm[ofm_z].size()) &&
+                  (ifm_x >= 0 && ifm_x < ifm[ofm_z][ofm_y].size())) {
+                ofm[ofm_z][ofm_y][ofm_x] +=
+                    ifm[ifm_z][ifm_y][ifm_x] * wgt[wgt_z][wgt_y][wgt_x];
               }
             }
           }
@@ -122,13 +119,13 @@ Array3D Functional::conv3d(Array3D& input,
     }
   }
 
-  return output;
+  return ofm;
 }
 
 void print1d(const Array1D& data, const std::string& name) {
   std::cout << name << std::endl;
-  for (auto it : data) {
-    std::cout << it << ", ";
+  for (int x = 0; x < data.size(); x++) {
+    std::cout << data[x] << ", ";
   }
   std::cout << std::endl;
   std::cout << std::endl;
@@ -136,9 +133,9 @@ void print1d(const Array1D& data, const std::string& name) {
 
 void print2d(const Array2D& data, const std::string& name) {
   std::cout << name << std::endl;
-  for (int i = 0; i < data.size(); i++) {
-    for (int j = 0; j < data[i].size(); j++) {
-      std::cout << data[i][j] << ", ";
+  for (int y = 0; y < data.size(); y++) {
+    for (int x = 0; x < data[y].size(); x++) {
+      std::cout << data[y][x] << ", ";
     }
     std::cout << std::endl;
   }
@@ -147,10 +144,10 @@ void print2d(const Array2D& data, const std::string& name) {
 
 void print3d(const Array3D& data, const std::string& name) {
   std::cout << name << std::endl;
-  for (int i = 0; i < data.size(); i++) {
-    for (int j = 0; j < data[i].size(); j++) {
-      for (int k = 0; k < data[i][j].size(); k++) {
-        std::cout << data[i][j][k] << ", ";
+  for (int z = 0; z < data.size(); z++) {
+    for (int y = 0; y < data[z].size(); y++) {
+      for (int x = 0; x < data[z][y].size(); x++) {
+        std::cout << data[z][y][x] << ", ";
       }
       std::cout << std::endl;
     }
@@ -161,39 +158,39 @@ void print3d(const Array3D& data, const std::string& name) {
 
 int main(void) {
   Functional F;
-  unsigned int input_size = 8;
-  unsigned int kernel_size = 5;
+  unsigned int ifm_size = 8;
+  unsigned int wgt_size = 5;
   unsigned int stride = 2;
   unsigned int padding = 2;
-  // unsigned int padding = kernel_size / 2; // same input/output size
+  // unsigned int padding = wgt_size / 2; // same ifm/ofm size
   unsigned int dilation = 1;
 
   //// 1. 1D convolution
   std::cout << "\n--- 1D convolution ---\n" << std::endl;
-  Array1D input1(input_size, 1);
-  Array1D kernel1(kernel_size, 2);
-  auto output1 = F.conv1d(input1, kernel1, stride, padding, dilation);
-  print1d(input1, "input");
-  print1d(kernel1, "kernel");
-  print1d(output1, "output");
+  Array1D ifm1(ifm_size, 1);
+  Array1D wgt1(wgt_size, 2);
+  auto ofm1 = F.conv1d(ifm1, wgt1, stride, padding, dilation);
+  print1d(ifm1, "input");
+  print1d(wgt1, "kernel/weight/mask/filter");
+  print1d(ofm1, "output");
 
   //// 2. 2D convolution
   std::cout << "\n--- 2D convolution ---\n" << std::endl;
-  Array2D input2(input_size, Array1D(input_size, 1));
-  Array2D kernel2(kernel_size, Array1D(kernel_size, 2));
-  auto output2 = F.conv2d(input2, kernel2, stride, padding, dilation);
-  print2d(input2, "input");
-  print2d(kernel2, "kernel");
-  print2d(output2, "output");
+  Array2D ifm2(ifm_size, Array1D(ifm_size, 1));
+  Array2D wgt2(wgt_size, Array1D(wgt_size, 2));
+  auto ofm2 = F.conv2d(ifm2, wgt2, stride, padding, dilation);
+  print2d(ifm2, "input");
+  print2d(wgt2, "kernel/weight/mask/filter");
+  print2d(ofm2, "output");
 
   //// 3. 3D convolution
   std::cout << "\n--- 3D convolution ---\n" << std::endl;
-  Array3D input3(input_size, Array2D(input_size, Array1D(input_size, 1)));
-  Array3D kernel3(kernel_size, Array2D(kernel_size, Array1D(kernel_size, 2)));
-  auto output3 = F.conv3d(input3, kernel3, stride, padding, dilation);
-  print3d(input3, "input");
-  print3d(kernel3, "kernel");
-  print3d(output3, "output");
+  Array3D ifm3(ifm_size, Array2D(ifm_size, Array1D(ifm_size, 1)));
+  Array3D wgt3(wgt_size, Array2D(wgt_size, Array1D(wgt_size, 2)));
+  auto ofm3 = F.conv3d(ifm3, wgt3, stride, padding, dilation);
+  print3d(ifm3, "input");
+  print3d(wgt3, "kernel/weight/mask/filter");
+  print3d(ofm3, "output");
 
   return 0;
 }
