@@ -20,22 +20,22 @@ using Array3D = std::vector<Array2D>;
 class Functional {
  public:
   Array1D conv1d(Array1D& input, Array1D& kernel, unsigned int stride = 1,
-                 unsigned int padding = 0);
+                 unsigned int padding = 0, unsigned int dilation = 1);
   Array2D conv2d(Array2D& input, Array2D& kernel, unsigned int stride = 1,
-                 unsigned int padding = 0);
+                 unsigned int padding = 0, unsigned int dilation = 1);
   Array3D conv3d(Array3D& input, Array3D& kernel, unsigned int stride = 1,
-                 unsigned int padding = 0);
+                 unsigned int padding = 0, unsigned int dilation = 1);
 };
 
 Array1D Functional::conv1d(Array1D& input, Array1D& kernel, unsigned int stride,
-                           unsigned int padding) {
+                           unsigned int padding, unsigned int dilation) {
   unsigned int size = (input.size() + 2 * padding - kernel.size()) / stride + 1;
 
   Array1D output(size, 0);
 
   for (int i = 0; i < output.size(); i += 1) {
     for (int k = 0; k < kernel.size(); k++) {
-      int col = i * stride - padding + k;
+      int col = (i * stride - padding) + k * dilation;
       if (col >= 0 && col < input.size()) {
         output[i] += input[col] * kernel[k];
       }
@@ -46,7 +46,7 @@ Array1D Functional::conv1d(Array1D& input, Array1D& kernel, unsigned int stride,
 }
 
 Array2D Functional::conv2d(Array2D& input, Array2D& kernel, unsigned int stride,
-                           unsigned int padding) {
+                           unsigned int padding, unsigned int dilation) {
   unsigned int row_size =
       (input.size() + 2 * padding - kernel.size()) / stride + 1;
   unsigned int col_size =
@@ -58,8 +58,8 @@ Array2D Functional::conv2d(Array2D& input, Array2D& kernel, unsigned int stride,
     for (int j = 0; j < output[i].size(); j++) {
       for (int m = 0; m < kernel.size(); m++) {
         for (int n = 0; n < kernel.size(); n++) {
-          int row = (i * stride - padding) + m;
-          int col = (j * stride - padding) + n;
+          int row = (i * stride - padding) + m * dilation;
+          int col = (j * stride - padding) + n * dilation;
           if (row >= 0 && row < input.size() && col >= 0 &&
               col < input[i].size()) {
             output[i][j] += input[row][col] * kernel[m][n];
@@ -73,7 +73,7 @@ Array2D Functional::conv2d(Array2D& input, Array2D& kernel, unsigned int stride,
 }
 
 Array3D Functional::conv3d(Array3D& input, Array3D& kernel, unsigned int stride,
-                           unsigned int padding) {
+                           unsigned int padding, unsigned int dilation) {
   unsigned int row_size =
       (input.size() + 2 * padding - kernel.size()) / stride + 1;
   unsigned int col_size =
@@ -89,9 +89,9 @@ Array3D Functional::conv3d(Array3D& input, Array3D& kernel, unsigned int stride,
         for (int m = 0; m < kernel.size(); m++) {
           for (int n = 0; n < kernel.size(); n++) {
             for (int l = 0; l < kernel.size(); l++) {
-              int row = (i * stride - padding) + m;
-              int col = (j * stride - padding) + n;
-              int depth = (k * stride - padding) + l;
+              int row = (i * stride - padding) + m * dilation;
+              int col = (j * stride - padding) + n * dilation;
+              int depth = (k * stride - padding) + l * dilation;
               if (row >= 0 && row < input.size() && col >= 0 &&
                   col < input[i].size() && depth >= 0 &&
                   depth < input[i][j].size()) {
@@ -145,6 +145,7 @@ int main(void) {
   unsigned int stride = 2;
   unsigned int padding = 2;
   // unsigned int padding = kernel_size / 2; // same input/output size
+  unsigned int dilation = 1;
 
   //// 1. 1D array convolution
   std::cout << "\n--- 1D convolution ---\n" << std::endl;
@@ -158,7 +159,7 @@ int main(void) {
   print1d(kernel1);
 
   std::cout << "output: " << std::endl;
-  auto output1 = F.conv1d(input1, kernel1, stride, padding);
+  auto output1 = F.conv1d(input1, kernel1, stride, padding, dilation);
   print1d(output1);
 
   //// 2. 2D array convolution
@@ -173,14 +174,14 @@ int main(void) {
   print2d(kernel2);
 
   std::cout << "output: " << std::endl;
-  auto output2 = F.conv2d(input2, kernel2, stride, padding);
+  auto output2 = F.conv2d(input2, kernel2, stride, padding, dilation);
   print2d(output2);
 
   //// 3. 3D array convolution
   std::cout << "\n--- 3D convolution ---\n" << std::endl;
   Array3D input3(input_size, Array2D(input_size, Array1D(input_size, 1)));
   Array3D kernel3(kernel_size, Array2D(kernel_size, Array1D(kernel_size, 2)));
-  auto output3 = F.conv3d(input3, kernel3, stride, padding);
+  auto output3 = F.conv3d(input3, kernel3, stride, padding, dilation);
   print3d(output3);
 
   return 0;
