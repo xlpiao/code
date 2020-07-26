@@ -168,7 +168,7 @@ int main(void) {
   // unsigned int padding = kernel_size / 2; // same input/output size
   unsigned int dilation = 1;
 
-  //// 1. 1D array convolution
+  //// 1. 1D convolution
   std::cout << "\n--- 1D convolution ---\n" << std::endl;
   Array1D input1(input_size, 1);
   Array1D kernel1(kernel_size, 2);
@@ -177,7 +177,7 @@ int main(void) {
   print1d(kernel1, "kernel");
   print1d(output1, "output");
 
-  //// 2. 2D array convolution
+  //// 2. 2D convolution
   std::cout << "\n--- 2D convolution ---\n" << std::endl;
   Array2D input2(input_size, Array1D(input_size, 1));
   Array2D kernel2(kernel_size, Array1D(kernel_size, 2));
@@ -186,7 +186,7 @@ int main(void) {
   print2d(kernel2, "kernel");
   print2d(output2, "output");
 
-  //// 3. 3D array convolution
+  //// 3. 3D convolution
   std::cout << "\n--- 3D convolution ---\n" << std::endl;
   Array3D input3(input_size, Array2D(input_size, Array1D(input_size, 1)));
   Array3D kernel3(kernel_size, Array2D(kernel_size, Array1D(kernel_size, 2)));
