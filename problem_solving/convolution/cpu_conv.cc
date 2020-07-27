@@ -18,6 +18,10 @@ using Array2D = std::vector<Array1D>;
 using Array3D = std::vector<Array2D>;
 using Array4D = std::vector<Array3D>;
 
+inline auto Tensor(unsigned int d4, unsigned int d3, unsigned int d2, unsigned int d1, float value = 0.0f) {
+  return Array4D(d4, Array3D(d3, Array2D(d2, Array1D(d1, value))));
+}
+
 class Functional {
 public:
   Array1D conv1d(Array1D& ifm,
@@ -71,7 +75,7 @@ Array4D Functional::conv1d(Array4D& ifm,
   unsigned int width =
       (ifm[0][0][0].size() + 2 * padding - wgt[0][0][0].size()) / stride + 1;
 
-  Array4D ofm{Array4D(1, Array3D(1, Array2D(1, Array1D(width, 0.0f))))};
+  Array4D ofm{Tensor(1, 1, 1, width, 0.0f)};
 
   for (int ofm_x = 0; ofm_x < ofm[0][0][0].size(); ofm_x++) {
     for (int wgt_x = 0; wgt_x < wgt[0][0][0].size(); wgt_x++) {
@@ -219,8 +223,8 @@ int main(void) {
   print1d(wgt1, "kernel/weight/mask/filter");
   print1d(ofm1, "output");
 
-  Array4D ifm11{Array4D(1, Array3D(1, Array2D(1, Array1D(ifm_size, 1))))};
-  Array4D wgt11{Array4D(1, Array3D(1, Array2D(1, Array1D(wgt_size, 2))))};
+  Array4D ifm11{Tensor(1, 1, 1, ifm_size, 1)};
+  Array4D wgt11{Tensor(1, 1, 1, wgt_size, 2)};
   auto ofm11 = F.conv1d(ifm11, wgt11, stride, padding, dilation);
   print(ifm11, "input");
   print(wgt11, "kernel/weight/mask/filter");
