@@ -47,11 +47,11 @@ Array1D Functional::conv1d(Array1D& ifm,
 
   Array1D ofm(width, 0);
 
-  for (int ofm_x = 0; ofm_x < ofm.size(); ofm_x++) {
-    for (int wgt_x = 0; wgt_x < wgt.size(); wgt_x++) {
-      int ifm_x = (ofm_x * stride - padding) + wgt_x * dilation;
-      if (ifm_x >= 0 && ifm_x < ifm.size()) {
-        ofm[ofm_x] += ifm[ifm_x] * wgt[wgt_x];
+  for (int ofm_w = 0; ofm_w < ofm.size(); ofm_w++) {
+    for (int wgt_w = 0; wgt_w < wgt.size(); wgt_w++) {
+      int ifm_w = (ofm_w * stride - padding) + wgt_w * dilation;
+      if (ifm_w >= 0 && ifm_w < ifm.size()) {
+        ofm[ofm_w] += ifm[ifm_w] * wgt[wgt_w];
       }
     }
   }
@@ -69,15 +69,15 @@ Array2D Functional::conv2d(Array2D& ifm,
 
   Array2D ofm(height, Array1D(width, 0));
 
-  for (int ofm_y = 0; ofm_y < ofm.size(); ofm_y++) {
-    for (int ofm_x = 0; ofm_x < ofm[ofm_y].size(); ofm_x++) {
-      for (int wgt_y = 0; wgt_y < wgt.size(); wgt_y++) {
-        for (int wgt_x = 0; wgt_x < wgt.size(); wgt_x++) {
-          int ifm_y = (ofm_y * stride - padding) + wgt_y * dilation;
-          int ifm_x = (ofm_x * stride - padding) + wgt_x * dilation;
-          if ((ifm_y >= 0 && ifm_y < ifm.size()) &&
-              (ifm_x >= 0 && ifm_x < ifm[ofm_y].size())) {
-            ofm[ofm_y][ofm_x] += ifm[ifm_y][ifm_x] * wgt[wgt_y][wgt_x];
+  for (int ofm_h = 0; ofm_h < ofm.size(); ofm_h++) {
+    for (int ofm_w = 0; ofm_w < ofm[ofm_h].size(); ofm_w++) {
+      for (int wgt_h = 0; wgt_h < wgt.size(); wgt_h++) {
+        for (int wgt_w = 0; wgt_w < wgt.size(); wgt_w++) {
+          int ifm_h = (ofm_h * stride - padding) + wgt_h * dilation;
+          int ifm_w = (ofm_w * stride - padding) + wgt_w * dilation;
+          if ((ifm_h >= 0 && ifm_h < ifm.size()) &&
+              (ifm_w >= 0 && ifm_w < ifm[ofm_h].size())) {
+            ofm[ofm_h][ofm_w] += ifm[ifm_h][ifm_w] * wgt[wgt_h][wgt_w];
           }
         }
       }
@@ -99,20 +99,20 @@ Array3D Functional::conv3d(Array3D& ifm,
 
   Array3D ofm(depth, Array2D(height, Array1D(width, 0)));
 
-  for (int ofm_z = 0; ofm_z < ofm.size(); ofm_z++) {
-    for (int ofm_y = 0; ofm_y < ofm[ofm_z].size(); ofm_y++) {
-      for (int ofm_x = 0; ofm_x < ofm[ofm_z][ofm_y].size(); ofm_x++) {
-        for (int wgt_z = 0; wgt_z < wgt.size(); wgt_z++) {
-          for (int wgt_y = 0; wgt_y < wgt.size(); wgt_y++) {
-            for (int wgt_x = 0; wgt_x < wgt.size(); wgt_x++) {
-              int ifm_z = (ofm_z * stride - padding) + wgt_z * dilation;
-              int ifm_y = (ofm_y * stride - padding) + wgt_y * dilation;
-              int ifm_x = (ofm_x * stride - padding) + wgt_x * dilation;
-              if ((ifm_z >= 0 && ifm_z < ifm.size()) &&
-                  (ifm_y >= 0 && ifm_y < ifm[ofm_z].size()) &&
-                  (ifm_x >= 0 && ifm_x < ifm[ofm_z][ofm_y].size())) {
-                ofm[ofm_z][ofm_y][ofm_x] +=
-                    ifm[ifm_z][ifm_y][ifm_x] * wgt[wgt_z][wgt_y][wgt_x];
+  for (int ofm_b = 0; ofm_b < ofm.size(); ofm_b++) {
+    for (int ofm_h = 0; ofm_h < ofm[ofm_b].size(); ofm_h++) {
+      for (int ofm_w = 0; ofm_w < ofm[ofm_b][ofm_h].size(); ofm_w++) {
+        for (int wgt_b = 0; wgt_b < wgt.size(); wgt_b++) {
+          for (int wgt_h = 0; wgt_h < wgt.size(); wgt_h++) {
+            for (int wgt_w = 0; wgt_w < wgt.size(); wgt_w++) {
+              int ifm_b = (ofm_b * stride - padding) + wgt_b * dilation;
+              int ifm_h = (ofm_h * stride - padding) + wgt_h * dilation;
+              int ifm_w = (ofm_w * stride - padding) + wgt_w * dilation;
+              if ((ifm_b >= 0 && ifm_b < ifm.size()) &&
+                  (ifm_h >= 0 && ifm_h < ifm[ofm_b].size()) &&
+                  (ifm_w >= 0 && ifm_w < ifm[ofm_b][ofm_h].size())) {
+                ofm[ofm_b][ofm_h][ofm_w] +=
+                    ifm[ifm_b][ifm_h][ifm_w] * wgt[wgt_b][wgt_h][wgt_w];
               }
             }
           }
@@ -208,38 +208,42 @@ torch::Tensor conv2d(torch::Tensor &ifm,
                      unsigned int dilation) {
   float *ifm_p = (float *)ifm.data_ptr();
   auto ifm_a = ifm.accessor<float, 4>();
-  const auto ifm_b = ifm_a.size(0);
-  const auto ifm_c = ifm_a.size(1);
-  const auto ifm_h = ifm_a.size(2);
-  const auto ifm_w = ifm_a.size(3);
-  // const auto ifm_size = ifm_b * ifm_c * ifm_h * ifm_w;
+  const auto ifm_batch = ifm_a.size(0);
+  // const auto ifm_channel = ifm_a.size(1);
+  const auto ifm_height = ifm_a.size(2);
+  const auto ifm_width = ifm_a.size(3);
+  // const auto ifm_size = ifm_batch * ifm_channel * ifm_height * ifm_width;
 
   float *wgt_p = (float *)wgt.data_ptr();
   auto wgt_a = wgt.accessor<float, 4>();
-  const auto wgt_b = wgt_a.size(0);
-  const auto wgt_c = wgt_a.size(1);
-  const auto wgt_h = wgt_a.size(2);
-  const auto wgt_w = wgt_a.size(3);
-  // const auto wgt_size = wgt_b * wgt_c * wgt_h * wgt_w;
+  // const auto wgt_batch = wgt_a.size(0);
+  const auto wgt_channel = wgt_a.size(1);
+  const auto wgt_height = wgt_a.size(2);
+  const auto wgt_width = wgt_a.size(3);
+  // const auto wgt_size = wgt_batch * wgt_channel * wgt_height * wgt_width;
 
-  const auto ofm_b = ifm_b;
-  const auto ofm_c = wgt_c;
-  const auto ofm_h = (ifm_h + 2 * padding - wgt_h) / stride + 1;
-  const auto ofm_w = (ifm_w + 2 * padding - wgt_w) / stride + 1;
-  torch::Tensor ofm = torch::zeros({ofm_b, ofm_c, ofm_h, ofm_w});
+  const auto ofm_batch = ifm_batch;
+  const auto ofm_channel = wgt_channel;
+  const auto ofm_height = (ifm_height + 2 * padding - wgt_height) / stride + 1;
+  const auto ofm_width = (ifm_width + 2 * padding - wgt_width) / stride + 1;
+  torch::Tensor ofm =
+      torch::zeros({ofm_batch, ofm_channel, ofm_height, ofm_width});
   float *ofm_p = (float *)ofm.data_ptr();
-  // auto ofm_a = ofm.accessor<float, 4>();
-  // const auto ofm_size = ofm_b * ofm_c * ofm_h * ofm_w;
+  // const auto ofm_size = ofm_batch * ofm_channel * ofm_height * ofm_width;
 
-  for (int ofm_y = 0; ofm_y < ofm_h; ofm_y++) {
-    for (int ofm_x = 0; ofm_x < ofm_w; ofm_x++) {
-      for (int wgt_y = 0; wgt_y < wgt_h; wgt_y++) {
-        for (int wgt_x = 0; wgt_x < wgt_w; wgt_x++) {
-          int ifm_y = (ofm_y * stride - padding) + wgt_y * dilation;
-          int ifm_x = (ofm_x * stride - padding) + wgt_x * dilation;
-          if ((ifm_y >= 0 && ifm_y < ifm_h) && (ifm_x >= 0 && ifm_x < ifm_w)) {
-            ofm_p[ofm_y * ofm_w + ofm_x] +=
-                ifm_p[ifm_y * ifm_w + ifm_x] * wgt_p[wgt_y * wgt_w + wgt_x];
+  for (int ofm_b = 0; ofm_b < ofm_batch; ofm_b++) {
+    for (int ofm_h = 0; ofm_h < ofm_height; ofm_h++) {
+      for (int ofm_w = 0; ofm_w < ofm_width; ofm_w++) {
+        for (int wgt_h = 0; wgt_h < wgt_height; wgt_h++) {
+          for (int wgt_w = 0; wgt_w < wgt_width; wgt_w++) {
+            int ifm_h = (ofm_h * stride - padding) + wgt_h * dilation;
+            int ifm_w = (ofm_w * stride - padding) + wgt_w * dilation;
+            if ((ifm_h >= 0 && ifm_h < ifm_height) &&
+                (ifm_w >= 0 && ifm_w < ifm_width)) {
+              ofm_p[ofm_h * ofm_width + ofm_w] +=
+                  ifm_p[ifm_h * ifm_width + ifm_w] *
+                  wgt_p[wgt_h * wgt_width + wgt_w];
+            }
           }
         }
       }
