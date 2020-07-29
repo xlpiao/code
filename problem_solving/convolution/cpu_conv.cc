@@ -2,7 +2,7 @@
  * File              : cpu_conv.cc
  * Author            : Xianglan Piao <xianglan0502@gmail.com>
  * Date              : 2020.06.15
- * Last Modified Date: 2020.06.15
+ * Last Modified Date: 2020.07.29
  * Last Modified By  : Xianglan Piao <xianglan0502@gmail.com>
  */
 
@@ -11,26 +11,18 @@
 /* input_index = (output_index * stride - padding) + kernel_index * dilation */
 
 #include <iostream>
+
+#if 0
 #include <vector>
 
 using Array1D = std::vector<float>;
 using Array2D = std::vector<Array1D>;
 using Array3D = std::vector<Array2D>;
-using Array4D = std::vector<Array3D>;
-
-inline auto Tensor(unsigned int d4, unsigned int d3, unsigned int d2, unsigned int d1, float value = 0.0f) {
-  return Array4D(d4, Array3D(d3, Array2D(d2, Array1D(d1, value))));
-}
 
 class Functional {
 public:
   Array1D conv1d(Array1D& ifm,
                  Array1D& wgt,
-                 unsigned int stride = 1,
-                 unsigned int padding = 0,
-                 unsigned int dilation = 1);
-  Array4D conv1d(Array4D& ifm,
-                 Array4D& wgt,
                  unsigned int stride = 1,
                  unsigned int padding = 0,
                  unsigned int dilation = 1);
@@ -60,28 +52,6 @@ Array1D Functional::conv1d(Array1D& ifm,
       int ifm_x = (ofm_x * stride - padding) + wgt_x * dilation;
       if (ifm_x >= 0 && ifm_x < ifm.size()) {
         ofm[ofm_x] += ifm[ifm_x] * wgt[wgt_x];
-      }
-    }
-  }
-
-  return ofm;
-}
-
-Array4D Functional::conv1d(Array4D& ifm,
-                           Array4D& wgt,
-                           unsigned int stride,
-                           unsigned int padding,
-                           unsigned int dilation) {
-  unsigned int width =
-      (ifm[0][0][0].size() + 2 * padding - wgt[0][0][0].size()) / stride + 1;
-
-  Array4D ofm{Tensor(1, 1, 1, width, 0.0f)};
-
-  for (int ofm_x = 0; ofm_x < ofm[0][0][0].size(); ofm_x++) {
-    for (int wgt_x = 0; wgt_x < wgt[0][0][0].size(); wgt_x++) {
-      int ifm_x = (ofm_x * stride - padding) + wgt_x * dilation;
-      if (ifm_x >= 0 && ifm_x < ifm[0][0][0].size()) {
-        ofm[0][0][0][ofm_x] += ifm[0][0][0][ifm_x] * wgt[0][0][0][wgt_x];
       }
     }
   }
@@ -188,24 +158,7 @@ void print3d(const Array3D& data, const std::string& name) {
   std::cout << std::endl;
 }
 
-void print(const Array4D& data, const std::string& name) {
-  std::cout << name << std::endl;
-  for (int z = 0; z < data.size(); z++) {
-    for (int y = 0; y < data[z].size(); y++) {
-      for (int x = 0; x < data[z][y].size(); x++) {
-        for (int i = 0; i < data[0][0][0].size(); i++) {
-          std::cout << data[0][0][0][i] << ", ";
-        }
-        std::cout << std::endl;
-      }
-      std::cout << std::endl;
-    }
-    std::cout << std::endl;
-  }
-  std::cout << std::endl;
-}
-
-int main(void) {
+void test() {
   Functional F;
   unsigned int ifm_size = 8;
   unsigned int wgt_size = 5;
@@ -222,13 +175,6 @@ int main(void) {
   print1d(ifm1, "input");
   print1d(wgt1, "kernel/weight/mask/filter");
   print1d(ofm1, "output");
-
-  Array4D ifm11{Tensor(1, 1, 1, ifm_size, 1)};
-  Array4D wgt11{Tensor(1, 1, 1, wgt_size, 2)};
-  auto ofm11 = F.conv1d(ifm11, wgt11, stride, padding, dilation);
-  print(ifm11, "input");
-  print(wgt11, "kernel/weight/mask/filter");
-  print(ofm11, "output");
 
   //// 2. 2D convolution
   std::cout << "\n--- 2D convolution ---\n" << std::endl;
@@ -247,6 +193,63 @@ int main(void) {
   print3d(ifm3, "input");
   print3d(wgt3, "kernel/weight/mask/filter");
   print3d(ofm3, "output");
+}
 
+int main(void) {
+  test();
   return 0;
 }
+#else
+#include <torch/extension.h>
+torch::Tensor conv2d(torch::Tensor &ifm,
+                     torch::Tensor &wgt,
+                     unsigned int stride,
+                     unsigned int padding,
+                     unsigned int dilation) {
+  float *ifm_p = (float *)ifm.data_ptr();
+  auto ifm_a = ifm.accessor<float, 4>();
+  const auto ifm_b = ifm_a.size(0);
+  const auto ifm_c = ifm_a.size(1);
+  const auto ifm_h = ifm_a.size(2);
+  const auto ifm_w = ifm_a.size(3);
+  // const auto ifm_size = ifm_b * ifm_c * ifm_h * ifm_w;
+
+  float *wgt_p = (float *)wgt.data_ptr();
+  auto wgt_a = wgt.accessor<float, 4>();
+  const auto wgt_b = wgt_a.size(0);
+  const auto wgt_c = wgt_a.size(1);
+  const auto wgt_h = wgt_a.size(2);
+  const auto wgt_w = wgt_a.size(3);
+  // const auto wgt_size = wgt_b * wgt_c * wgt_h * wgt_w;
+
+  const auto ofm_b = ifm_b;
+  const auto ofm_c = wgt_c;
+  const auto ofm_h = (ifm_h + 2 * padding - wgt_h) / stride + 1;
+  const auto ofm_w = (ifm_w + 2 * padding - wgt_w) / stride + 1;
+  torch::Tensor ofm = torch::zeros({ofm_b, ofm_c, ofm_h, ofm_w});
+  float *ofm_p = (float *)ofm.data_ptr();
+  // auto ofm_a = ofm.accessor<float, 4>();
+  // const auto ofm_size = ofm_b * ofm_c * ofm_h * ofm_w;
+
+  for (int ofm_y = 0; ofm_y < ofm_h; ofm_y++) {
+    for (int ofm_x = 0; ofm_x < ofm_w; ofm_x++) {
+      for (int wgt_y = 0; wgt_y < wgt_h; wgt_y++) {
+        for (int wgt_x = 0; wgt_x < wgt_w; wgt_x++) {
+          int ifm_y = (ofm_y * stride - padding) + wgt_y * dilation;
+          int ifm_x = (ofm_x * stride - padding) + wgt_x * dilation;
+          if ((ifm_y >= 0 && ifm_y < ifm_h) && (ifm_x >= 0 && ifm_x < ifm_w)) {
+            ofm_p[ofm_y * ofm_w + ofm_x] +=
+                ifm_p[ifm_y * ifm_w + ifm_x] * wgt_p[wgt_y * wgt_w + wgt_x];
+          }
+        }
+      }
+    }
+  }
+
+  return ofm;
+}
+
+PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
+  m.def("conv2d", &conv2d, "naive conv2d with one cpu core");
+}
+#endif
