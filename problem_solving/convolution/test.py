@@ -5,7 +5,7 @@ import torch.nn.functional as F
 import cpu
 
 ifm = (torch.rand(1, 3, 5, 5) * 10).int().float()
-wgt = (torch.ones(1, 3, 3, 3) * 2).float()
+wgt = (torch.rand(2, 3, 3, 3) * 10).int().float()
 print(ifm)
 print(wgt)
 
@@ -14,3 +14,7 @@ print(ofm1)
 
 ofm2 = cpu.conv2d(ifm, wgt, 1, 1, 1)
 print(ofm2)
+
+print(ofm1.shape)
+print(ofm2.shape)
+print(ofm1 == ofm2)

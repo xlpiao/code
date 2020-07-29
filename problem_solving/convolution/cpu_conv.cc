@@ -223,8 +223,8 @@ torch::Tensor conv2d(torch::Tensor &ifm,
   // const auto wgt_size = wgt_batch * wgt_channel * wgt_height * wgt_width;
   assert(ifm_channel == wgt_channel);
 
-  const auto ofm_batch = ifm_batch * wgt_batch;
-  const auto ofm_channel = 1;  // wgt_channel = ifm_channel;
+  const auto ofm_batch = ifm_batch;
+  const auto ofm_channel = wgt_batch;
   const auto ofm_height = (ifm_height + 2 * padding - wgt_height) / stride + 1;
   const auto ofm_width = (ifm_width + 2 * padding - wgt_width) / stride + 1;
   torch::Tensor ofm =
@@ -232,29 +232,35 @@ torch::Tensor conv2d(torch::Tensor &ifm,
   float *ofm_p = (float *)ofm.data_ptr();
   // const auto ofm_size = ofm_batch * ofm_channel * ofm_height * ofm_width;
 
-  // for (int ofm_b = 0; ofm_b < ofm_batch; ofm_b++) {
-  for (int ofm_h = 0; ofm_h < ofm_height; ofm_h++) {
-    for (int ofm_w = 0; ofm_w < ofm_width; ofm_w++) {
-      for (int wgt_c = 0; wgt_c < wgt_channel; wgt_c++) {
-        for (int wgt_h = 0; wgt_h < wgt_height; wgt_h++) {
-          for (int wgt_w = 0; wgt_w < wgt_width; wgt_w++) {
-            int ifm_h = (ofm_h * stride - padding) + wgt_h * dilation;
-            int ifm_w = (ofm_w * stride - padding) + wgt_w * dilation;
-            int ifm_c = wgt_c;
-            if ((ifm_h >= 0 && ifm_h < ifm_height) &&
-                (ifm_w >= 0 && ifm_w < ifm_width)) {
-              ofm_p[ofm_h * ofm_width + ofm_w] +=
-                  ifm_p[ifm_c * ifm_height * ifm_width + ifm_h * ifm_width +
-                        ifm_w] *
-                  wgt_p[wgt_c * wgt_height * wgt_width + wgt_h * wgt_width +
-                        wgt_w];
+  for (int ifm_b = 0; ifm_b < ifm_batch; ifm_b++) {
+    for (int wgt_b = 0; wgt_b < wgt_batch; wgt_b++) {
+      for (int ofm_h = 0; ofm_h < ofm_height; ofm_h++) {
+        for (int ofm_w = 0; ofm_w < ofm_width; ofm_w++) {
+          for (int wgt_c = 0; wgt_c < wgt_channel; wgt_c++) {
+            for (int wgt_h = 0; wgt_h < wgt_height; wgt_h++) {
+              for (int wgt_w = 0; wgt_w < wgt_width; wgt_w++) {
+                int ifm_c = wgt_c;
+                int ifm_h = (ofm_h * stride - padding) + wgt_h * dilation;
+                int ifm_w = (ofm_w * stride - padding) + wgt_w * dilation;
+                if ((ifm_h >= 0 && ifm_h < ifm_height) &&
+                    (ifm_w >= 0 && ifm_w < ifm_width)) {
+                  int ofm_b = ifm_b * wgt_batch + wgt_b;
+                  ofm_p[ofm_b * ofm_height * ofm_width + ofm_h * ofm_width +
+                        ofm_w] +=
+                      ifm_p[ifm_b * ifm_channel * ifm_height * ifm_width +
+                            ifm_c * ifm_height * ifm_width + ifm_h * ifm_width +
+                            ifm_w] *
+                      wgt_p[wgt_b * wgt_channel * wgt_height * wgt_width +
+                            wgt_c * wgt_height * wgt_width + wgt_h * wgt_width +
+                            wgt_w];
+                }
+              }
             }
           }
         }
       }
     }
   }
-  // }
 
   return ofm;
 }
