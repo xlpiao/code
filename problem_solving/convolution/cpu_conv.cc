@@ -209,21 +209,22 @@ torch::Tensor conv2d(torch::Tensor &ifm,
   float *ifm_p = (float *)ifm.data_ptr();
   auto ifm_a = ifm.accessor<float, 4>();
   const auto ifm_batch = ifm_a.size(0);
-  // const auto ifm_channel = ifm_a.size(1);
+  const auto ifm_channel = ifm_a.size(1);
   const auto ifm_height = ifm_a.size(2);
   const auto ifm_width = ifm_a.size(3);
   // const auto ifm_size = ifm_batch * ifm_channel * ifm_height * ifm_width;
 
   float *wgt_p = (float *)wgt.data_ptr();
   auto wgt_a = wgt.accessor<float, 4>();
-  // const auto wgt_batch = wgt_a.size(0);
+  const auto wgt_batch = wgt_a.size(0);
   const auto wgt_channel = wgt_a.size(1);
   const auto wgt_height = wgt_a.size(2);
   const auto wgt_width = wgt_a.size(3);
   // const auto wgt_size = wgt_batch * wgt_channel * wgt_height * wgt_width;
+  assert(ifm_channel == wgt_channel);
 
-  const auto ofm_batch = ifm_batch;
-  const auto ofm_channel = wgt_channel;
+  const auto ofm_batch = ifm_batch * wgt_batch;
+  const auto ofm_channel = 1;  // wgt_channel = ifm_channel;
   const auto ofm_height = (ifm_height + 2 * padding - wgt_height) / stride + 1;
   const auto ofm_width = (ifm_width + 2 * padding - wgt_width) / stride + 1;
   torch::Tensor ofm =
@@ -231,24 +232,29 @@ torch::Tensor conv2d(torch::Tensor &ifm,
   float *ofm_p = (float *)ofm.data_ptr();
   // const auto ofm_size = ofm_batch * ofm_channel * ofm_height * ofm_width;
 
-  for (int ofm_b = 0; ofm_b < ofm_batch; ofm_b++) {
-    for (int ofm_h = 0; ofm_h < ofm_height; ofm_h++) {
-      for (int ofm_w = 0; ofm_w < ofm_width; ofm_w++) {
+  // for (int ofm_b = 0; ofm_b < ofm_batch; ofm_b++) {
+  for (int ofm_h = 0; ofm_h < ofm_height; ofm_h++) {
+    for (int ofm_w = 0; ofm_w < ofm_width; ofm_w++) {
+      for (int wgt_c = 0; wgt_c < wgt_channel; wgt_c++) {
         for (int wgt_h = 0; wgt_h < wgt_height; wgt_h++) {
           for (int wgt_w = 0; wgt_w < wgt_width; wgt_w++) {
             int ifm_h = (ofm_h * stride - padding) + wgt_h * dilation;
             int ifm_w = (ofm_w * stride - padding) + wgt_w * dilation;
+            int ifm_c = wgt_c;
             if ((ifm_h >= 0 && ifm_h < ifm_height) &&
                 (ifm_w >= 0 && ifm_w < ifm_width)) {
               ofm_p[ofm_h * ofm_width + ofm_w] +=
-                  ifm_p[ifm_h * ifm_width + ifm_w] *
-                  wgt_p[wgt_h * wgt_width + wgt_w];
+                  ifm_p[ifm_c * ifm_height * ifm_width + ifm_h * ifm_width +
+                        ifm_w] *
+                  wgt_p[wgt_c * wgt_height * wgt_width + wgt_h * wgt_width +
+                        wgt_w];
             }
           }
         }
       }
     }
   }
+  // }
 
   return ofm;
 }

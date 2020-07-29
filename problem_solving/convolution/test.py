@@ -4,8 +4,8 @@ import torch
 import torch.nn.functional as F
 import cpu
 
-ifm = torch.ones(1, 1, 5, 5)
-wgt = torch.ones(1, 1, 3, 3) * 2
+ifm = (torch.rand(1, 3, 5, 5) * 10).int().float()
+wgt = (torch.ones(1, 3, 3, 3) * 2).float()
 print(ifm)
 print(wgt)
 
