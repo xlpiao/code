@@ -225,8 +225,14 @@ torch::Tensor conv2d(torch::Tensor &ifm,
 
   const auto ofm_batch = ifm_batch;
   const auto ofm_channel = wgt_batch;
-  const auto ofm_height = (ifm_height + 2 * padding - wgt_height) / stride + 1;
-  const auto ofm_width = (ifm_width + 2 * padding - wgt_width) / stride + 1;
+  const auto ofm_height = ((ifm_height + 2 * padding - wgt_height) -
+                           (wgt_height - 1) * (dilation - 1)) /
+                              stride +
+                          1;
+  const auto ofm_width = ((ifm_width + 2 * padding - wgt_width) -
+                          (wgt_width - 1) * (dilation - 1)) /
+                             stride +
+                         1;
   torch::Tensor ofm =
       torch::zeros({ofm_batch, ofm_channel, ofm_height, ofm_width});
   float *ofm_p = (float *)ofm.data_ptr();
