@@ -239,8 +239,9 @@ __global__ void cuda_conv2d_naive(float *ofm,
                                   const unsigned int stride,
                                   const unsigned int padding,
                                   const unsigned int dilation) {
-  int ofm_b = blockIdx.x * blockDim.x + threadIdx.x;
-  int ofm_c = blockIdx.y * blockDim.y + threadIdx.y;
+  int ofm_b = blockIdx.y * blockDim.y + threadIdx.y;
+  int ofm_c = blockIdx.x * blockDim.x + threadIdx.x;
+  // printf("ofm_b: %d, ofm_c:%d\n", ofm_b, ofm_c);
 
   // for (int ofm_b = 0; ofm_b < ofm_batch; ofm_b++) {
   // for (int ofm_c = 0; ofm_c < ofm_channel; ofm_c++) {
@@ -248,6 +249,7 @@ __global__ void cuda_conv2d_naive(float *ofm,
     if (ofm_c >= 0 && ofm_c < ofm_channel) {
       for (int ofm_h = 0; ofm_h < ofm_height; ofm_h++) {
         for (int ofm_w = 0; ofm_w < ofm_width; ofm_w++) {
+          float sum = 0.0f;
           for (int wgt_b = ofm_c, wgt_c = 0; wgt_c < wgt_channel; wgt_c++) {
             for (int wgt_h = 0; wgt_h < wgt_height; wgt_h++) {
               for (int wgt_w = 0; wgt_w < wgt_width; wgt_w++) {
@@ -257,20 +259,21 @@ __global__ void cuda_conv2d_naive(float *ofm,
                 int ifm_w = (ofm_w * stride - padding) + wgt_w * dilation;
                 if ((ifm_h >= 0 && ifm_h < ifm_height) &&
                     (ifm_w >= 0 && ifm_w < ifm_width)) {
-                  int ofm_idx = ofm_b * ofm_channel * ofm_height * ofm_width +
-                                ofm_c * ofm_height * ofm_width +
-                                ofm_h * ofm_width + ofm_w;
                   int ifm_idx = ifm_b * ifm_channel * ifm_height * ifm_width +
                                 ifm_c * ifm_height * ifm_width +
                                 ifm_h * ifm_width + ifm_w;
                   int wgt_idx = wgt_b * wgt_channel * wgt_height * wgt_width +
                                 wgt_c * wgt_height * wgt_width +
                                 wgt_h * wgt_width + wgt_w;
-                  ofm[ofm_idx] += ifm[ifm_idx] * wgt[wgt_idx];
+                  sum += ifm[ifm_idx] * wgt[wgt_idx];
                 }
               }
             }
           }
+          int ofm_idx = ofm_b * ofm_channel * ofm_height * ofm_width +
+                        ofm_c * ofm_height * ofm_width +
+                        ofm_h * ofm_width + ofm_w;
+          ofm[ofm_idx] = sum;
         }
       }
     }
@@ -325,8 +328,8 @@ torch::Tensor conv2d(torch::Tensor &ifm,
       wgt_d, wgt_p, wgt_size * sizeof(float), cudaMemcpyHostToDevice);
 
   dim3 block_dim(0);
-  block_dim.x = 1;
-  block_dim.y = 1;
+  block_dim.x = 8;
+  block_dim.y = 8;
 
   dim3 grid_dim(0);
   grid_dim.x = ofm_batch / block_dim.x;
