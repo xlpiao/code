@@ -10,8 +10,8 @@ stride = 1
 padding = 1
 dilation = 1
 
-ifm = (torch.rand(8, 3, 32, 32) * 10).int().float()
-wgt = (torch.rand(8, 3, 3, 3) * 10).int().float()
+ifm = (torch.rand(8, 1024, 32, 32) * 10).int().float()
+wgt = (torch.rand(8, 1024, 3, 3) * 10).int().float()
 print(ifm.shape)
 print(wgt.shape)
 

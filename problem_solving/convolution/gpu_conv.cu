@@ -239,16 +239,21 @@ __global__ void cuda_conv2d_naive(float *ofm,
                                   const unsigned int stride,
                                   const unsigned int padding,
                                   const unsigned int dilation) {
-  int ofm_b = blockIdx.y * blockDim.y + threadIdx.y;
-  int ofm_c = blockIdx.x * blockDim.x + threadIdx.x;
-  // printf("ofm_b: %d, ofm_c:%d\n", ofm_b, ofm_c);
+  int ofm_bc = blockIdx.x * blockDim.x + threadIdx.x;
+  int ofm_b = ofm_bc / ofm_channel;
+  int ofm_c = ofm_bc % ofm_channel;
+  int ofm_h = blockIdx.z * blockDim.z + threadIdx.z;
+  int ofm_w = blockIdx.y * blockDim.y + threadIdx.y;
 
-  // for (int ofm_b = 0; ofm_b < ofm_batch; ofm_b++) {
-  // for (int ofm_c = 0; ofm_c < ofm_channel; ofm_c++) {
+  // printf("%d, %d, %d, %d\n", ofm_b, ofm_c, ofm_h, ofm_w);
   if (ofm_b >= 0 && ofm_b < ofm_batch) {
     if (ofm_c >= 0 && ofm_c < ofm_channel) {
-      for (int ofm_h = 0; ofm_h < ofm_height; ofm_h++) {
-        for (int ofm_w = 0; ofm_w < ofm_width; ofm_w++) {
+      if (ofm_h >= 0 && ofm_h < ofm_height) {
+        if (ofm_w >= 0 && ofm_w < ofm_width) {
+  // for (int ofm_b = 0; ofm_b < ofm_batch; ofm_b++) {
+    // for (int ofm_c = 0; ofm_c < ofm_channel; ofm_c++) {
+      // for (int ofm_h = 0; ofm_h < ofm_height; ofm_h++) {
+        // for (int ofm_w = 0; ofm_w < ofm_width; ofm_w++) {
           float sum = 0.0f;
           for (int wgt_b = ofm_c, wgt_c = 0; wgt_c < wgt_channel; wgt_c++) {
             for (int wgt_h = 0; wgt_h < wgt_height; wgt_h++) {
@@ -330,10 +335,12 @@ torch::Tensor conv2d(torch::Tensor &ifm,
   dim3 block_dim(0);
   block_dim.x = 8;
   block_dim.y = 8;
+  block_dim.z = 8;
 
   dim3 grid_dim(0);
-  grid_dim.x = ofm_batch / block_dim.x;
-  grid_dim.y = ofm_channel / block_dim.y;
+  grid_dim.x = (ofm_batch * ofm_channel) / block_dim.x;
+  grid_dim.y = ofm_height / block_dim.y;
+  grid_dim.z = ofm_width / block_dim.z;
 
   cuda_conv2d_naive<<<grid_dim, block_dim>>>(ofm_d,
                                              ifm_d,
