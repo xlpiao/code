@@ -263,7 +263,7 @@ __global__ void cuda_conv2d_naive(float *ofm,
       // for (int ofm_h = 0; ofm_h < ofm_height; ofm_h++) {
         // for (int ofm_w = 0; ofm_w < ofm_width; ofm_w++) {
           float sum = 0.0f;
-          for (int wgt_b = ofm_c, wgt_c = 0; wgt_c < wgt_channel; wgt_c++) {
+          for (int wgt_b = ofm_c, wgt_c = 0; wgt_c < wgt_channel; wgt_c += 8) {
             for (int wgt_h = 0; wgt_h < wgt_height; wgt_h++) {
               for (int wgt_w = 0; wgt_w < wgt_width; wgt_w++) {
                 int ifm_b = ofm_b;
@@ -272,13 +272,15 @@ __global__ void cuda_conv2d_naive(float *ofm,
                 int ifm_w = (ofm_w * stride - padding) + wgt_w * dilation;
                 if ((ifm_h >= 0 && ifm_h < ifm_height) &&
                     (ifm_w >= 0 && ifm_w < ifm_width)) {
+                  for (int offset = 0; offset < 8; offset++) {
                   int ifm_idx = ifm_b * ifm_channel * ifm_height * ifm_width +
-                                ifm_c * ifm_height * ifm_width +
+                                (ifm_c + offset) * ifm_height * ifm_width +
                                 ifm_h * ifm_width + ifm_w;
                   int wgt_idx = wgt_b * wgt_channel * wgt_height * wgt_width +
-                                wgt_c * wgt_height * wgt_width +
+                                (wgt_c + offset) * wgt_height * wgt_width +
                                 wgt_h * wgt_width + wgt_w;
                   sum += ifm[ifm_idx] * wgt[wgt_idx];
+                  }
                 }
               }
             }
