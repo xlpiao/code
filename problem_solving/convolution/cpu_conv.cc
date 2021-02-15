@@ -234,14 +234,23 @@ torch::Tensor conv2d(torch::Tensor &ifm,
                              stride +
                          1;
   torch::Tensor ofm =
-      torch::zeros({ofm_batch, ofm_channel, ofm_height, ofm_width});
+      torch::zeros({ofm_batch, ofm_channel, ofm_height, ofm_width},
+      torch::dtype(torch::kFloat32));
   float *ofm_p = (float *)ofm.data_ptr();
-  // const auto ofm_size = ofm_batch * ofm_channel * ofm_height * ofm_width;
+#if ONEDIM
+  const auto ofm_size = ofm_batch * ofm_channel * ofm_height * ofm_width;
 
+  for(int ofm_index = 0; ofm_index < ofm_size; ofm_index++) {
+    int ofm_b = (ofm_index / ofm_width / ofm_height / ofm_channel);
+    int ofm_c = (ofm_index / ofm_width / ofm_height) % ofm_channel;
+    int ofm_h = (ofm_index / ofm_width) % ofm_height;
+    int ofm_w = (ofm_index) % ofm_width;
+#else
   for (int ofm_b = 0; ofm_b < ofm_batch; ofm_b++) {
     for (int ofm_c = 0; ofm_c < ofm_channel; ofm_c++) {
       for (int ofm_h = 0; ofm_h < ofm_height; ofm_h++) {
         for (int ofm_w = 0; ofm_w < ofm_width; ofm_w++) {
+#endif
           for (int wgt_b = ofm_c, wgt_c = 0; wgt_c < wgt_channel; wgt_c++) {
             for (int wgt_h = 0; wgt_h < wgt_height; wgt_h++) {
               for (int wgt_w = 0; wgt_w < wgt_width; wgt_w++) {
@@ -265,10 +274,14 @@ torch::Tensor conv2d(torch::Tensor &ifm,
               }
             }
           }
+#if ONEDIM
+  }
+#else
         }
       }
     }
   }
+#endif
 
   return ofm;
 }
