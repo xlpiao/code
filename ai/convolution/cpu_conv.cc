@@ -203,9 +203,11 @@ int main(void) {
 #include <torch/extension.h>
 torch::Tensor conv2d(torch::Tensor &ifm,
                      torch::Tensor &wgt,
+                     torch::Tensor &bias,
                      unsigned int stride,
                      unsigned int padding,
-                     unsigned int dilation) {
+                     unsigned int dilation,
+                     unsigned int groups) {
   float *ifm_p = (float *)ifm.data_ptr();
   auto ifm_a = ifm.accessor<float, 4>();
   const auto ifm_batch = ifm_a.size(0);
@@ -221,7 +223,12 @@ torch::Tensor conv2d(torch::Tensor &ifm,
   const auto wgt_height = wgt_a.size(2);
   const auto wgt_width = wgt_a.size(3);
   // const auto wgt_size = wgt_batch * wgt_channel * wgt_height * wgt_width;
-  assert(ifm_channel == wgt_channel);
+  assert(wgt_channel == ifm_channel);
+
+  float *bias_p = (float *)bias.data_ptr();
+  auto bias_a = bias.accessor<float, 1>();
+  const auto bias_size = bias_a.size(0);
+  assert(bias_size == wgt_batch);
 
   const auto ofm_batch = ifm_batch;
   const auto ofm_channel = wgt_batch;

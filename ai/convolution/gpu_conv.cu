@@ -224,6 +224,7 @@ int main(void) {
 __global__ void cuda_conv2d_naive(float *ofm,
                                   float *ifm,
                                   float *wgt,
+                                  float *bias,
                                   const unsigned int ofm_batch,
                                   const unsigned int ofm_channel,
                                   const unsigned int ofm_height,
@@ -236,9 +237,11 @@ __global__ void cuda_conv2d_naive(float *ofm,
                                   const unsigned int wgt_channel,
                                   const unsigned int wgt_height,
                                   const unsigned int wgt_width,
+                                  const unsigned int bias_size,
                                   const unsigned int stride,
                                   const unsigned int padding,
-                                  const unsigned int dilation) {
+                                  const unsigned int dilation,
+                                  const unsigned int groups) {
   int ofm_b = blockIdx.x * blockDim.x + threadIdx.x;
   int ofm_c = blockIdx.y * blockDim.y + threadIdx.y;
 
@@ -279,9 +282,11 @@ __global__ void cuda_conv2d_naive(float *ofm,
 
 torch::Tensor conv2d(torch::Tensor &ifm,
                      torch::Tensor &wgt,
+                     torch::Tensor &bias,
                      unsigned int stride,
                      unsigned int padding,
-                     unsigned int dilation) {
+                     unsigned int dilation,
+                     unsigned int groups) {
   float *ifm_p = (float *)ifm.data_ptr();
   auto ifm_a = ifm.accessor<float, 4>();
   const auto ifm_batch = ifm_a.size(0);
@@ -297,7 +302,12 @@ torch::Tensor conv2d(torch::Tensor &ifm,
   const auto wgt_height = wgt_a.size(2);
   const auto wgt_width = wgt_a.size(3);
   const auto wgt_size = wgt_batch * wgt_channel * wgt_height * wgt_width;
-  assert(ifm_channel == wgt_channel);
+  assert(wgt_channel == ifm_channel);
+
+  float *bias_p = (float *)bias.data_ptr();
+  auto bias_a = bias.accessor<float, 1>();
+  const auto bias_size = bias_a.size(0);
+  assert(bias_size == wgt_batch);
 
   const auto ofm_batch = ifm_batch;
   const auto ofm_channel = wgt_batch;
@@ -314,15 +324,15 @@ torch::Tensor conv2d(torch::Tensor &ifm,
   float *ofm_p = (float *)ofm.data_ptr();
   const auto ofm_size = ofm_batch * ofm_channel * ofm_height * ofm_width;
 
-  float *ifm_d, *wgt_d, *ofm_d;
+  float *ifm_d, *wgt_d, *bias_d, *ofm_d;
   cudaMalloc(&ifm_d, ifm_size * sizeof(float));
   cudaMalloc(&wgt_d, wgt_size * sizeof(float));
+  cudaMalloc(&bias_d, bias_size * sizeof(float));
   cudaMalloc(&ofm_d, ofm_size * sizeof(float));
 
-  cudaMemcpy(
-      ifm_d, ifm_p, ifm_size * sizeof(float), cudaMemcpyHostToDevice);
-  cudaMemcpy(
-      wgt_d, wgt_p, wgt_size * sizeof(float), cudaMemcpyHostToDevice);
+  cudaMemcpy(ifm_d, ifm_p, ifm_size * sizeof(float), cudaMemcpyHostToDevice);
+  cudaMemcpy(wgt_d, wgt_p, wgt_size * sizeof(float), cudaMemcpyHostToDevice);
+  cudaMemcpy(bias_d, bias_p, bias_size * sizeof(float), cudaMemcpyHostToDevice);
 
   dim3 block_dim(0);
   block_dim.x = 1;
@@ -335,6 +345,7 @@ torch::Tensor conv2d(torch::Tensor &ifm,
   cuda_conv2d_naive<<<grid_dim, block_dim>>>(ofm_d,
                                              ifm_d,
                                              wgt_d,
+                                             bias_d,
                                              ofm_batch,
                                              ofm_channel,
                                              ofm_height,
@@ -347,16 +358,20 @@ torch::Tensor conv2d(torch::Tensor &ifm,
                                              wgt_channel,
                                              wgt_height,
                                              wgt_width,
+                                             bias_size,
                                              stride,
                                              padding,
-                                             dilation);
+                                             dilation,
+                                             groups);
+
+  // sync and get output
   cudaDeviceSynchronize();
+  cudaMemcpy(ofm_p, ofm_d, ofm_size * sizeof(float), cudaMemcpyDeviceToHost);
 
-  cudaMemcpy(
-      ofm_p, ofm_d, ofm_size * sizeof(float), cudaMemcpyDeviceToHost);
-
+  // free
   cudaFree(ifm_d);
   cudaFree(wgt_d);
+  cudaFree(bias_d);
   cudaFree(ofm_d);
 
   return ofm;
