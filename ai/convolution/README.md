@@ -5,7 +5,7 @@
 
 # Docker
 ```
-docker run --gpus all --rm -it -v $PWD:/work pytorch/pytorch:1.5.1-cuda10.1-cudnn7-devel
+docker run --gpus all --rm -it -v $PWD:/work pytorch/pytorch:1.8.0-cuda11.1-cudnn8-devel
 cd /work
 ```
 
