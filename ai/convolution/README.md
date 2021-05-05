@@ -6,12 +6,13 @@
 # Docker
 ```
 docker run --gpus all --rm -it -v $PWD:/work pytorch/pytorch:1.5.1-cuda10.1-cudnn7-devel
+cd /work
 ```
 
 # Compile and Run
 ```
 ## install python extension
-python setup install
+python setup.py install
 
 ## execute test.py
 python test.py
