@@ -35,6 +35,7 @@ print("\r")
 t = time.perf_counter()
 ofm1 = nn.conv2d(ifm,
                  wgt,
+                 bias,
                  stride=stride,
                  padding=padding,
                  dilation=dilation,
