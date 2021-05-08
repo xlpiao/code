@@ -101,8 +101,8 @@ __global__ void conv2d_naive(float* ifm, float* ofm) {
 }
 
 void test() {
-  dim3 block_dim(0);
-  dim3 grid_dim(0);
+  dim3 block(0);
+  dim3 grid(0);
 
   float* h_ifm = NULL;
   float* d_ifm = NULL;
@@ -126,15 +126,15 @@ void test() {
   std::cout << std::endl;
   cudaMemcpyToSymbol(wgt, &h_wgt, sizeof(wgt));
 
-  block_dim.x = BLOCK_size;
-  grid_dim.x = ofm_size / block_dim.x;
+  block.x = BLOCK_size;
+  grid.x = ofm_size / block.x;
 
   cudaMalloc((void**)&d_ofm, ofm_size * sizeof(float));
   h_ofm = (float*)calloc(ofm_size, sizeof(float));
 
   //// using global memory
   cudaMemset(d_ofm, 0, ofm_size * sizeof(float));
-  conv1d_naive<<<grid_dim, block_dim>>>(d_ifm, d_ofm);
+  conv1d_naive<<<grid, block>>>(d_ifm, d_ofm);
   cudaDeviceSynchronize();
 
   memset(h_ofm, 0, ofm_size);
@@ -145,7 +145,7 @@ void test() {
 
   //// using shared memory
   cudaMemset(d_ofm, 0, ofm_size * sizeof(float));
-  conv1d_shared<<<grid_dim, block_dim>>>(d_ifm, d_ofm);
+  conv1d_shared<<<grid, block>>>(d_ifm, d_ofm);
   cudaDeviceSynchronize();
 
   memset(h_ofm, 0, ofm_size);
@@ -184,16 +184,16 @@ void test() {
   std::cout << std::endl;
   cudaMemcpyToSymbol(wgt2d, &h_wgt2d, sizeof(wgt2d));
 
-  block_dim.x = BLOCK_size;
-  block_dim.y = BLOCK_size;
-  grid_dim.x = ofm_size / block_dim.x;
-  grid_dim.y = ofm_size / block_dim.y;
+  block.x = BLOCK_size;
+  block.y = BLOCK_size;
+  grid.x = ofm_size / block.x;
+  grid.y = ofm_size / block.y;
 
   cudaMalloc((void**)&d_ofm, ofm_size * ofm_size * sizeof(float));
   h_ofm = (float*)calloc(ofm_size * ofm_size, sizeof(float));
   cudaMemset(d_ofm, 0, ofm_size * ofm_size * sizeof(float));
 
-  conv2d_naive<<<grid_dim, block_dim>>>(d_ifm, d_ofm);
+  conv2d_naive<<<grid, block>>>(d_ifm, d_ofm);
   cudaDeviceSynchronize();
 
   memset(h_ofm, 0, ofm_size * ofm_size);
@@ -335,35 +335,42 @@ torch::Tensor conv2d(torch::Tensor &ifm,
   cudaMemcpy(wgt_d, wgt_p, wgt_size * sizeof(float), cudaMemcpyHostToDevice);
   cudaMemcpy(bias_d, bias_p, bias_size * sizeof(float), cudaMemcpyHostToDevice);
 
-  dim3 block_dim(0);
-  block_dim.x = 1;
-  block_dim.y = 1;
+  dim3 block(0);  // blockDim: # of threads
+  block.x = 1;
+  block.y = 1;
 
-  dim3 grid_dim(0);
-  grid_dim.x = ofm_batch / block_dim.x;
-  grid_dim.y = ofm_channel / block_dim.y;
+  dim3 grid(0);  // gridDim: # of blocks
+  grid.x = (ofm_batch + block.x - 1) / block.x;
+  grid.y = (ofm_channel + block.y - 1) / block.y;
 
-  cuda_conv2d_naive<<<grid_dim, block_dim>>>(ofm_d,
-                                             ifm_d,
-                                             wgt_d,
-                                             bias_d,
-                                             ofm_batch,
-                                             ofm_channel,
-                                             ofm_height,
-                                             ofm_width,
-                                             ifm_batch,
-                                             ifm_channel,
-                                             ifm_height,
-                                             ifm_width,
-                                             wgt_batch,
-                                             wgt_channel,
-                                             wgt_height,
-                                             wgt_width,
-                                             bias_size,
-                                             stride,
-                                             padding,
-                                             dilation,
-                                             groups);
+  std::cout << "block(x,y,z): "
+            << "(" << block.x << "," << block.y << "," << block.z << ")"
+            << std::endl;
+  std::cout << "grid(x,y,z): "
+            << "(" << grid.x << "," << grid.y << "," << grid.z << ")"
+            << std::endl;
+
+  cuda_conv2d_naive<<<grid, block>>>(ofm_d,
+                                     ifm_d,
+                                     wgt_d,
+                                     bias_d,
+                                     ofm_batch,
+                                     ofm_channel,
+                                     ofm_height,
+                                     ofm_width,
+                                     ifm_batch,
+                                     ifm_channel,
+                                     ifm_height,
+                                     ifm_width,
+                                     wgt_batch,
+                                     wgt_channel,
+                                     wgt_height,
+                                     wgt_width,
+                                     bias_size,
+                                     stride,
+                                     padding,
+                                     dilation,
+                                     groups);
 
   // sync and get output
   cudaDeviceSynchronize();
