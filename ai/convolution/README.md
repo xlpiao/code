@@ -15,5 +15,5 @@ cd /work
 python setup.py install
 
 ## execute test.py
-python test.py
+python run_test.py
 ```
