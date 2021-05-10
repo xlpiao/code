@@ -11,6 +11,8 @@
 
 #include <iostream>
 
+#define CONV2D conv2d_optimized
+
 __global__ void cuda_conv2d_naive(float *ofm,
                                   float *ifm,
                                   float *wgt,
@@ -331,6 +333,150 @@ void conv2d_stream(float *ifm_p,
   }
 }
 
+__global__ void cuda_conv2d_optimized(float *ofm,
+                                      float *ifm,
+                                      float *wgt,
+                                      float *bias,
+                                      const unsigned int ofm_batch,
+                                      const unsigned int ofm_channel,
+                                      const unsigned int ofm_height,
+                                      const unsigned int ofm_width,
+                                      const unsigned int ifm_batch,
+                                      const unsigned int ifm_channel,
+                                      const unsigned int ifm_height,
+                                      const unsigned int ifm_width,
+                                      const unsigned int wgt_batch,
+                                      const unsigned int wgt_channel,
+                                      const unsigned int wgt_height,
+                                      const unsigned int wgt_width,
+                                      const unsigned int bias_size,
+                                      const unsigned int stride,
+                                      const unsigned int padding,
+                                      const unsigned int dilation,
+                                      const unsigned int groups) {
+  int ofm_b = blockIdx.x * blockDim.x + threadIdx.x;
+  int ofm_c = blockIdx.y * blockDim.y + threadIdx.y;
+
+  // for (int ofm_b = 0; ofm_b < ofm_batch; ofm_b++) {
+  // for (int ofm_c = 0; ofm_c < ofm_channel; ofm_c++) {
+  if (ofm_b >= 0 && ofm_b < ofm_batch) {
+    if (ofm_c >= 0 && ofm_c < ofm_channel) {
+      for (int ofm_h = 0; ofm_h < ofm_height; ofm_h++) {
+        for (int ofm_w = 0; ofm_w < ofm_width; ofm_w++) {
+          float temp = 0.0f;
+          int ofm_idx = ofm_b * ofm_channel * ofm_height * ofm_width +
+                        ofm_c * ofm_height * ofm_width + ofm_h * ofm_width +
+                        ofm_w;
+          for (int wgt_b = ofm_c, wgt_c = 0; wgt_c < wgt_channel; wgt_c++) {
+            for (int wgt_h = 0; wgt_h < wgt_height; wgt_h++) {
+              for (int wgt_w = 0; wgt_w < wgt_width; wgt_w++) {
+                int ifm_b = ofm_b;
+                int ifm_c = wgt_c;
+                int ifm_h = (ofm_h * stride - padding) + wgt_h * dilation;
+                int ifm_w = (ofm_w * stride - padding) + wgt_w * dilation;
+                if ((ifm_h >= 0 && ifm_h < ifm_height) &&
+                    (ifm_w >= 0 && ifm_w < ifm_width)) {
+                  int ifm_idx = ifm_b * ifm_channel * ifm_height * ifm_width +
+                                ifm_c * ifm_height * ifm_width +
+                                ifm_h * ifm_width + ifm_w;
+                  int wgt_idx = wgt_b * wgt_channel * wgt_height * wgt_width +
+                                wgt_c * wgt_height * wgt_width +
+                                wgt_h * wgt_width + wgt_w;
+                  temp += ifm[ifm_idx] * wgt[wgt_idx];
+                }
+              }
+            }
+          }
+          temp += bias[ofm_c];
+          ofm[ofm_idx] = temp;
+        }
+      }
+    }
+  }
+}
+
+void conv2d_optimized(float *ifm_p,
+                      const unsigned int ifm_batch,
+                      const unsigned int ifm_channel,
+                      const unsigned int ifm_height,
+                      const unsigned int ifm_width,
+                      const unsigned int ifm_size,
+                      float *wgt_p,
+                      const unsigned int wgt_batch,
+                      const unsigned int wgt_channel,
+                      const unsigned int wgt_height,
+                      const unsigned int wgt_width,
+                      const unsigned int wgt_size,
+                      float *bias_p,
+                      const unsigned int bias_size,
+                      float *ofm_p,
+                      const unsigned int ofm_batch,
+                      const unsigned int ofm_channel,
+                      const unsigned int ofm_height,
+                      const unsigned int ofm_width,
+                      const unsigned int ofm_size,
+                      unsigned int stride,
+                      unsigned int padding,
+                      unsigned int dilation,
+                      unsigned int groups) {
+  float *ifm_d, *wgt_d, *bias_d, *ofm_d;
+  cudaMalloc(&ifm_d, ifm_size * sizeof(float));
+  cudaMalloc(&wgt_d, wgt_size * sizeof(float));
+  cudaMalloc(&bias_d, bias_size * sizeof(float));
+  cudaMalloc(&ofm_d, ofm_size * sizeof(float));
+
+  cudaMemcpy(ifm_d, ifm_p, ifm_size * sizeof(float), cudaMemcpyHostToDevice);
+  cudaMemcpy(wgt_d, wgt_p, wgt_size * sizeof(float), cudaMemcpyHostToDevice);
+  cudaMemcpy(bias_d, bias_p, bias_size * sizeof(float), cudaMemcpyHostToDevice);
+
+  dim3 block(0);  // blockDim: # of threads
+  block.x = 1;
+  block.y = 1;
+
+  dim3 grid(0);  // gridDim: # of blocks
+  grid.x = (ofm_batch + block.x - 1) / block.x;
+  grid.y = (ofm_channel + block.y - 1) / block.y;
+
+  std::cout << "block(x,y,z): "
+            << "(" << block.x << "," << block.y << "," << block.z << ")"
+            << std::endl;
+  std::cout << "grid(x,y,z): "
+            << "(" << grid.x << "," << grid.y << "," << grid.z << ")"
+            << std::endl;
+
+  cuda_conv2d_optimized<<<grid, block>>>(ofm_d,
+                                         ifm_d,
+                                         wgt_d,
+                                         bias_d,
+                                         ofm_batch,
+                                         ofm_channel,
+                                         ofm_height,
+                                         ofm_width,
+                                         ifm_batch,
+                                         ifm_channel,
+                                         ifm_height,
+                                         ifm_width,
+                                         wgt_batch,
+                                         wgt_channel,
+                                         wgt_height,
+                                         wgt_width,
+                                         bias_size,
+                                         stride,
+                                         padding,
+                                         dilation,
+                                         groups);
+
+  // sync and get output
+  cudaDeviceSynchronize();
+  cudaMemcpy(ofm_p, ofm_d, ofm_size * sizeof(float), cudaMemcpyDeviceToHost);
+
+  // free
+  cudaFree(ifm_d);
+  cudaFree(wgt_d);
+  cudaFree(bias_d);
+  cudaFree(ofm_d);
+}
+
 torch::Tensor conv2d(torch::Tensor &ifm,
                      torch::Tensor &wgt,
                      torch::Tensor &bias,
@@ -375,57 +521,31 @@ torch::Tensor conv2d(torch::Tensor &ifm,
   float *ofm_p = (float *)ofm.data_ptr();
   const auto ofm_size = ofm_batch * ofm_channel * ofm_height * ofm_width;
 
-#if 0
-  conv2d_stream(ifm_p,
-                ifm_batch,
-                ifm_channel,
-                ifm_height,
-                ifm_width,
-                ifm_size,
-                wgt_p,
-                wgt_batch,
-                wgt_channel,
-                wgt_height,
-                wgt_width,
-                wgt_size,
-                bias_p,
-                bias_size,
-                ofm_p,
-                ofm_batch,
-                ofm_channel,
-                ofm_height,
-                ofm_width,
-                ofm_size,
-                stride,
-                padding,
-                dilation,
-                groups);
-#endif
+  CONV2D(ifm_p,
+         ifm_batch,
+         ifm_channel,
+         ifm_height,
+         ifm_width,
+         ifm_size,
+         wgt_p,
+         wgt_batch,
+         wgt_channel,
+         wgt_height,
+         wgt_width,
+         wgt_size,
+         bias_p,
+         bias_size,
+         ofm_p,
+         ofm_batch,
+         ofm_channel,
+         ofm_height,
+         ofm_width,
+         ofm_size,
+         stride,
+         padding,
+         dilation,
+         groups);
 
-  conv2d_naive(ifm_p,
-               ifm_batch,
-               ifm_channel,
-               ifm_height,
-               ifm_width,
-               ifm_size,
-               wgt_p,
-               wgt_batch,
-               wgt_channel,
-               wgt_height,
-               wgt_width,
-               wgt_size,
-               bias_p,
-               bias_size,
-               ofm_p,
-               ofm_batch,
-               ofm_channel,
-               ofm_height,
-               ofm_width,
-               ofm_size,
-               stride,
-               padding,
-               dilation,
-               groups);
   return ofm;
 }
 
