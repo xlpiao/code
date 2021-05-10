@@ -41,6 +41,7 @@ __global__ void cuda_conv2d_naive(float *ofm,
     if (ofm_c >= 0 && ofm_c < ofm_channel) {
       for (int ofm_h = 0; ofm_h < ofm_height; ofm_h++) {
         for (int ofm_w = 0; ofm_w < ofm_width; ofm_w++) {
+          float temp = 0.0f;
           int ofm_idx = ofm_b * ofm_channel * ofm_height * ofm_width +
                         ofm_c * ofm_height * ofm_width + ofm_h * ofm_width +
                         ofm_w;
@@ -59,12 +60,13 @@ __global__ void cuda_conv2d_naive(float *ofm,
                   int wgt_idx = wgt_b * wgt_channel * wgt_height * wgt_width +
                                 wgt_c * wgt_height * wgt_width +
                                 wgt_h * wgt_width + wgt_w;
-                  ofm[ofm_idx] += ifm[ifm_idx] * wgt[wgt_idx];
+                  temp += ifm[ifm_idx] * wgt[wgt_idx];
                 }
               }
             }
           }
-          ofm[ofm_idx] += bias[ofm_c];
+          temp += bias[ofm_c];
+          ofm[ofm_idx] = temp;
         }
       }
     }
@@ -373,6 +375,7 @@ torch::Tensor conv2d(torch::Tensor &ifm,
   float *ofm_p = (float *)ofm.data_ptr();
   const auto ofm_size = ofm_batch * ofm_channel * ofm_height * ofm_width;
 
+#if 0
   conv2d_stream(ifm_p,
                 ifm_batch,
                 ifm_channel,
@@ -397,8 +400,8 @@ torch::Tensor conv2d(torch::Tensor &ifm,
                 padding,
                 dilation,
                 groups);
+#endif
 
-#if 0
   conv2d_naive(ifm_p,
                ifm_batch,
                ifm_channel,
@@ -423,7 +426,6 @@ torch::Tensor conv2d(torch::Tensor &ifm,
                padding,
                dilation,
                groups);
-#endif
   return ofm;
 }
 
