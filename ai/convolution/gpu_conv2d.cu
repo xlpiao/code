@@ -177,6 +177,12 @@ __global__ void cuda_conv2d_stream(float *ofm,
   int ofm_w = blockIdx.x * blockDim.x + threadIdx.x;
   int ofm_h = blockIdx.y * blockDim.y + threadIdx.y;
 
+  // __shared__ float input[ifm_channel][ifm_height][ifm_width];
+  // __shared__ float kernel[wgt_channel][wgt_height][wgt_width];
+
+  __shared__ float input[3][32][32];
+  __shared__ float kernel[3][3][3];
+
   float temp = 0.0f;
   for (int wgt_c = 0; wgt_c < wgt_channel; wgt_c++) {
     for (int wgt_h = 0; wgt_h < wgt_height; wgt_h++) {
@@ -191,7 +197,14 @@ __global__ void cuda_conv2d_stream(float *ofm,
               ifm_c * ifm_height * ifm_width + ifm_h * ifm_width + ifm_w;
           int wgt_idx =
               wgt_c * wgt_height * wgt_width + wgt_h * wgt_width + wgt_w;
-          temp += ifm[ifm_idx] * wgt[wgt_idx];
+          input[ifm_c][ifm_h][ifm_w] = ifm[ifm_idx];
+          kernel[wgt_c][wgt_h][wgt_w] = wgt[wgt_idx];
+          __syncthreads();
+        }
+        if ((ifm_c >= 0 && ifm_c < ifm_channel) &&
+            (ifm_h >= 0 && ifm_h < ifm_height) &&
+            (ifm_w >= 0 && ifm_w < ifm_width)) {
+          temp += input[ifm_c][ifm_h][ifm_w] * kernel[wgt_c][wgt_h][wgt_w];
         }
       }
     }
@@ -230,13 +243,13 @@ void conv2d_stream(float *ifm_p,
   }
 
   dim3 block(0);  // blockDim: # of threads
-  block.x = 1;
-  block.y = 1;
+  block.x = ofm_width;
+  block.y = ofm_height;
   // block.z = ifm_channel;
 
   dim3 grid(0);  // gridDim: # of blocks
-  grid.x = (ifm_width + block.x - 1) / block.x;
-  grid.y = (ifm_height + block.y - 1) / block.y;
+  grid.x = (ofm_width + block.x - 1) / block.x;
+  grid.y = (ofm_height + block.y - 1) / block.y;
   // grid.y = (ifm_channel + block.z - 1) / block.z;
 
   std::cout << "block(x,y,z): "
@@ -310,9 +323,6 @@ void conv2d_stream(float *ifm_p,
   }
   cudaDeviceSynchronize();
 
-  // for (int i = 0; i < 32 * 32; i++) {
-  // std::cout << ofm_p[i] << std::endl;
-  // }
   /* destroy cuda stream */
   for (int i = 0; i < ifm_batch; i++) {
     cudaStreamDestroy(stream[i]);
