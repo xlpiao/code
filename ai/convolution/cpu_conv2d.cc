@@ -13,6 +13,160 @@
 #include <torch/extension.h>
 
 #include <iostream>
+
+torch::Tensor unfold_v1(torch::Tensor &ifm,
+                        torch::Tensor &wgt,
+                        torch::Tensor &bias,
+                        int stride,
+                        int padding,
+                        int dilation,
+                        int groups) {
+  float *ifm_p = (float *)ifm.data_ptr();
+  auto ifm_a = ifm.accessor<float, 4>();
+  const auto ifm_batch = ifm_a.size(0);
+  const auto ifm_channel = ifm_a.size(1);
+  const auto ifm_height = ifm_a.size(2);
+  const auto ifm_width = ifm_a.size(3);
+  // const auto ifm_size = ifm_batch * ifm_channel * ifm_height * ifm_width;
+
+  float *wgt_p = (float *)wgt.data_ptr();
+  auto wgt_a = wgt.accessor<float, 4>();
+  const auto wgt_batch = wgt_a.size(0);
+  const auto wgt_channel = wgt_a.size(1);
+  const auto wgt_height = wgt_a.size(2);
+  const auto wgt_width = wgt_a.size(3);
+  // const auto wgt_size = wgt_batch * wgt_channel * wgt_height * wgt_width;
+  assert(wgt_channel == ifm_channel);
+
+  float *bias_p = (float *)bias.data_ptr();
+  auto bias_a = bias.accessor<float, 1>();
+  const auto bias_size = bias_a.size(0);
+  assert(bias_size == wgt_batch);
+
+  const auto ofm_batch = ifm_batch;
+  const auto ofm_channel = wgt_batch;
+  const auto ofm_height = ((ifm_height + 2 * padding - wgt_height) -
+                           (wgt_height - 1) * (dilation - 1)) /
+                              stride +
+                          1;
+  const auto ofm_width = ((ifm_width + 2 * padding - wgt_width) -
+                          (wgt_width - 1) * (dilation - 1)) /
+                             stride +
+                         1;
+  torch::Tensor ofm = torch::zeros({ofm_batch,
+                                    wgt_channel * wgt_height * wgt_width,
+                                    ofm_height * ofm_width});
+  float *ofm_p = (float *)ofm.data_ptr();
+  // const auto ofm_size = ofm_batch * ofm_channel * ofm_height * ofm_width;
+
+  for (int ofm_b = 0; ofm_b < ofm_batch; ofm_b++) {
+    for (int wgt_c = 0; wgt_c < wgt_channel; wgt_c++) {
+      for (int wgt_h = 0; wgt_h < wgt_height; wgt_h++) {
+        for (int wgt_w = 0; wgt_w < wgt_width; wgt_w++) {
+          for (int ofm_h = 0; ofm_h < ofm_height; ofm_h++) {
+            for (int ofm_w = 0; ofm_w < ofm_width; ofm_w++) {
+              int ofm_idx =
+                  ofm_b * wgt_channel * wgt_height * wgt_width * ofm_height *
+                      ofm_width +
+                  wgt_c * wgt_height * wgt_width * ofm_height * ofm_width +
+                  wgt_h * wgt_width * ofm_height * ofm_width +
+                  wgt_w * ofm_height * ofm_width + ofm_h * ofm_width + ofm_w;
+              int ifm_b = ofm_b;
+              int ifm_c = wgt_c;
+              int ifm_h = (ofm_h * stride - padding) + wgt_h * dilation;
+              int ifm_w = (ofm_w * stride - padding) + wgt_w * dilation;
+              if ((ifm_h >= 0 && ifm_h < ifm_height) &&
+                  (ifm_w >= 0 && ifm_w < ifm_width)) {
+                int ifm_idx = ifm_b * ifm_channel * ifm_height * ifm_width +
+                              ifm_c * ifm_height * ifm_width +
+                              ifm_h * ifm_width + ifm_w;
+                ofm_p[ofm_idx] = ifm_p[ifm_idx];
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return ofm;
+}
+
+torch::Tensor unfold_v2(torch::Tensor &ifm,
+                        torch::Tensor &wgt,
+                        torch::Tensor &bias,
+                        int stride,
+                        int padding,
+                        int dilation,
+                        int groups) {
+  float *ifm_p = (float *)ifm.data_ptr();
+  auto ifm_a = ifm.accessor<float, 4>();
+  const auto ifm_batch = ifm_a.size(0);
+  const auto ifm_channel = ifm_a.size(1);
+  const auto ifm_height = ifm_a.size(2);
+  const auto ifm_width = ifm_a.size(3);
+  // const auto ifm_size = ifm_batch * ifm_channel * ifm_height * ifm_width;
+
+  float *wgt_p = (float *)wgt.data_ptr();
+  auto wgt_a = wgt.accessor<float, 4>();
+  const auto wgt_batch = wgt_a.size(0);
+  const auto wgt_channel = wgt_a.size(1);
+  const auto wgt_height = wgt_a.size(2);
+  const auto wgt_width = wgt_a.size(3);
+  // const auto wgt_size = wgt_batch * wgt_channel * wgt_height * wgt_width;
+  assert(wgt_channel == ifm_channel);
+
+  float *bias_p = (float *)bias.data_ptr();
+  auto bias_a = bias.accessor<float, 1>();
+  const auto bias_size = bias_a.size(0);
+  assert(bias_size == wgt_batch);
+
+  const auto ofm_batch = ifm_batch;
+  const auto ofm_channel = wgt_batch;
+  const auto ofm_height = ((ifm_height + 2 * padding - wgt_height) -
+                           (wgt_height - 1) * (dilation - 1)) /
+                              stride +
+                          1;
+  const auto ofm_width = ((ifm_width + 2 * padding - wgt_width) -
+                          (wgt_width - 1) * (dilation - 1)) /
+                             stride +
+                         1;
+  torch::Tensor ofm = torch::zeros({ofm_batch,
+                                    wgt_channel * wgt_height * wgt_width,
+                                    ofm_height * ofm_width});
+  float *ofm_p = (float *)ofm.data_ptr();
+  // const auto ofm_size = ofm_batch * ofm_channel * ofm_height * ofm_width;
+
+  const auto wgt_size = wgt_channel * wgt_height * wgt_width;
+  const auto ofm_size = ofm_height * ofm_width;
+
+  for (int ofm_b = 0; ofm_b < ofm_batch; ofm_b++) {
+    for (int wgt_s = 0; wgt_s < wgt_size; wgt_s++) {
+      const int wgt_c = wgt_s / wgt_height / wgt_width;
+      const int wgt_h = (wgt_s / wgt_width) % wgt_height;
+      const int wgt_w = wgt_s % wgt_width;
+      for (int ofm_s = 0; ofm_s < ofm_size; ofm_s++) {
+        const int ofm_h = (ofm_s / ofm_width) % ofm_height;
+        const int ofm_w = ofm_s % ofm_width;
+        int ofm_idx = ofm_b * wgt_size * ofm_size + wgt_s * ofm_size + ofm_s;
+        int ifm_b = ofm_b;
+        int ifm_c = wgt_c;
+        int ifm_h = (ofm_h * stride - padding) + wgt_h * dilation;
+        int ifm_w = (ofm_w * stride - padding) + wgt_w * dilation;
+        if ((ifm_h >= 0 && ifm_h < ifm_height) &&
+            (ifm_w >= 0 && ifm_w < ifm_width)) {
+          int ifm_idx = ifm_b * ifm_channel * ifm_height * ifm_width +
+                        ifm_c * ifm_height * ifm_width + ifm_h * ifm_width +
+                        ifm_w;
+          ofm_p[ofm_idx] = ifm_p[ifm_idx];
+        }
+      }
+    }
+  }
+
+  return ofm;
+}
+
 torch::Tensor conv2d(torch::Tensor &ifm,
                      torch::Tensor &wgt,
                      torch::Tensor &bias,
@@ -95,4 +249,6 @@ torch::Tensor conv2d(torch::Tensor &ifm,
 
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   m.def("conv2d", &conv2d, "naive conv2d with one cpu core");
+  m.def("unfold_v1", &unfold_v1, "naive unfold with one cpu core");
+  m.def("unfold_v2", &unfold_v2, "flattened unfold with one cpu core");
 }

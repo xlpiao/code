@@ -12,15 +12,59 @@ import pdb
 
 ## torch.rand(batch, channel, width, height)
 ## torch.rand(4D, 3D, 2D, 1D)
-ifm = (torch.rand(8, 3, 32, 32) * 10).int().float()  #input
-wgt = (torch.rand(8, 3, 3, 3) * 10).int().float()  #weight
-bias = (torch.rand(8) * 10).int().float()
-stride = 1
-padding = 1
-dilation = 1
-groups = 1
+IFM_B = 8
+IFM_C = 3
+IFM_W = 32
+IFM_H = 32
+WGT_B = 8
+WGT_C = IFM_C
+WGT_W = 3
+WGT_H = 3
+BIAS_SIZE = WGT_B
+STRIDE = 1
+PADDING = 1
+DILATION = 1
+GROUPS = 1
 
+ifm = (torch.rand(IFM_B, IFM_C, IFM_H, IFM_W) * 10).int().float()  #input
+wgt = (torch.rand(WGT_B, WGT_C, WGT_H, WGT_W) * 10).int().float()  #weight
+bias = (torch.rand(BIAS_SIZE) * 0).int().float()
+stride = STRIDE
+padding = PADDING
+dilation = DILATION
+groups = GROUPS
 print("\r")
+
+t = time.perf_counter()
+im2col_ifm = nn.unfold(ifm, (WGT_H, WGT_W),
+                       dilation=dilation,
+                       padding=padding,
+                       stride=stride)
+print("nn.unfold():\t", format(time.perf_counter() - t, ".6f") + "s")
+print(im2col_ifm.shape)
+print("\r")
+
+t = time.perf_counter()
+im2col_ifm1 = cpu.unfold_v1(ifm, wgt, bias, stride, padding, dilation, groups)
+print("cpu.unfold():\t", format(time.perf_counter() - t, ".6f") + "s")
+print(im2col_ifm1.shape)
+print((im2col_ifm == im2col_ifm1).all())
+print("\r")
+
+t = time.perf_counter()
+im2col_ifm2 = cpu.unfold_v2(ifm, wgt, bias, stride, padding, dilation, groups)
+print("cpu.unfold():\t", format(time.perf_counter() - t, ".6f") + "s")
+print(im2col_ifm2.shape)
+print((im2col_ifm == im2col_ifm2).all())
+print("\r")
+
+t = time.perf_counter()
+im2col_ifm3 = gpu.unfold(ifm, wgt, bias, stride, padding, dilation, groups)
+print("gpu.unfold():\t", format(time.perf_counter() - t, ".6f") + "s")
+print(im2col_ifm3.shape)
+print((im2col_ifm == im2col_ifm3).all())
+print("\r")
+
 print("ifm.shape:\t", ifm.shape)
 print("wgt.shape:\t", wgt.shape)
 print("bias.shape:\t", bias.shape)
@@ -30,7 +74,7 @@ print("dilation:\t", dilation)
 print("groups:\t\t", groups)
 print("\r")
 
-# pdb.set_trace()
+## pdb.set_trace()
 
 t = time.perf_counter()
 ofm1 = nn.conv2d(ifm,
@@ -41,22 +85,19 @@ ofm1 = nn.conv2d(ifm,
                  dilation=dilation,
                  groups=groups)
 print("nn.conv2d():\t", format(time.perf_counter() - t, ".6f") + "s")
-# print("nn.conv2d() result:\t", ofm1)
+print(ofm1.shape)
+print("\r")
 
 t = time.perf_counter()
 ofm2 = cpu.conv2d(ifm, wgt, bias, stride, padding, dilation, groups)
 print("cpu.conv2d():\t", format(time.perf_counter() - t, ".6f") + "s")
-# print("cpu.conv2d() result:\t", ofm2)
+print(ofm2.shape)
+print((ofm1 == ofm2).all())
+print("\r")
 
 t = time.perf_counter()
 ofm3 = gpu.conv2d(ifm, wgt, bias, stride, padding, dilation, groups)
 print("gpu.conv2d():\t", format(time.perf_counter() - t, ".6f") + "s")
-# print("gpu.conv2d() result:\t", ofm3)
-
-print("\r")
-print(ofm1.shape)
-print(ofm2.shape)
 print(ofm3.shape)
+print((ofm1 == ofm3).all())
 print("\r")
-# print(ofm1 == ofm2)
-# print(ofm1 == ofm3)
