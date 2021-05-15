@@ -473,21 +473,14 @@ void conv2d_optimized(float *ifm_p,
   cudaMemcpy(wgt_d, wgt_p, wgt_size * sizeof(float), cudaMemcpyHostToDevice);
   cudaMemcpy(bias_d, bias_p, bias_size * sizeof(float), cudaMemcpyHostToDevice);
 
-  dim3 block(0);  // blockDim: # of threads
-  dim3 grid(0);   // gridDim: # of blocks
-
-  std::cout << "block(x,y,z): "
-            << "(" << block.x << "," << block.y << "," << block.z << ")"
-            << std::endl;
-  std::cout << "grid(x,y,z): "
-            << "(" << grid.x << "," << grid.y << "," << grid.z << ")"
-            << std::endl;
-
   int ifm_im2col_size =
       ofm_batch * wgt_channel * wgt_height * wgt_width * ofm_height * ofm_width;
   float *ifm_im2col;
   cudaMalloc(&ifm_im2col, ifm_im2col_size * sizeof(float));
   cudaMemset(&ifm_im2col, 0, ifm_im2col_size * sizeof(float));
+
+  dim3 block(0);  // blockDim: # of threads
+  dim3 grid(0);   // gridDim: # of blocks
 
   const int wgt_im2col_size = wgt_channel * wgt_height * wgt_width;
   const int channel_im2col_size = ofm_height * ofm_width;
@@ -497,6 +490,12 @@ void conv2d_optimized(float *ifm_p,
   grid.x = (channel_im2col_size + block.x - 1) / block.x;
   grid.y = (wgt_im2col_size + block.y - 1) / block.y;
   grid.z = (ofm_batch + block.z - 1) / block.z;
+  std::cout << "block(x,y,z): "
+            << "(" << block.x << "," << block.y << "," << block.z << ")"
+            << std::endl;
+  std::cout << "grid(x,y,z): "
+            << "(" << grid.x << "," << grid.y << "," << grid.z << ")"
+            << std::endl;
 
   cuda_im2col<<<grid, block>>>(ifm_d,
                                ifm_batch,
@@ -531,6 +530,13 @@ void conv2d_optimized(float *ifm_p,
   grid.x = (channel_im2col_size + block.x - 1) / block.x;
   grid.y = (ofm_channel + block.y - 1) / block.y;
   grid.z = (ofm_batch + block.z - 1) / block.z;
+  std::cout << "block(x,y,z): "
+            << "(" << block.x << "," << block.y << "," << block.z << ")"
+            << std::endl;
+  std::cout << "grid(x,y,z): "
+            << "(" << grid.x << "," << grid.y << "," << grid.z << ")"
+            << std::endl;
+
   cuda_gemm<<<grid, block>>>(ifm_d,
                              ifm_batch,
                              ifm_channel,

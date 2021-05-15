@@ -169,13 +169,13 @@ torch::Tensor unfold_v2(torch::Tensor &ifm,
   return ofm;
 }
 
-torch::Tensor conv2d_optimized(torch::Tensor &ifm,
-                               torch::Tensor &wgt,
-                               torch::Tensor &bias,
-                               unsigned int stride,
-                               unsigned int padding,
-                               unsigned int dilation,
-                               unsigned int groups) {
+torch::Tensor conv2d(torch::Tensor &ifm,
+                     torch::Tensor &wgt,
+                     torch::Tensor &bias,
+                     unsigned int stride,
+                     unsigned int padding,
+                     unsigned int dilation,
+                     unsigned int groups) {
   float *ifm_p = (float *)ifm.data_ptr();
   auto ifm_a = ifm.accessor<float, 4>();
   const auto ifm_batch = ifm_a.size(0);
@@ -349,16 +349,6 @@ torch::Tensor conv2d_naive(torch::Tensor &ifm,
   }
 
   return ofm;
-}
-
-torch::Tensor conv2d(torch::Tensor &ifm,
-                     torch::Tensor &wgt,
-                     torch::Tensor &bias,
-                     unsigned int stride,
-                     unsigned int padding,
-                     unsigned int dilation,
-                     unsigned int groups) {
-  CONV2D(ifm, wgt, bias, padding, dilation, groups);
 }
 
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
