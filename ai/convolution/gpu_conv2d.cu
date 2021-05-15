@@ -334,65 +334,108 @@ void conv2d_stream(float *ifm_p,
   }
 }
 
-__global__ void cuda_conv2d_optimized(float *ofm,
-                                      float *ifm,
-                                      float *wgt,
-                                      float *bias,
-                                      const unsigned int ofm_batch,
-                                      const unsigned int ofm_channel,
-                                      const unsigned int ofm_height,
-                                      const unsigned int ofm_width,
-                                      const unsigned int ifm_batch,
-                                      const unsigned int ifm_channel,
-                                      const unsigned int ifm_height,
-                                      const unsigned int ifm_width,
-                                      const unsigned int wgt_batch,
-                                      const unsigned int wgt_channel,
-                                      const unsigned int wgt_height,
-                                      const unsigned int wgt_width,
-                                      const unsigned int bias_size,
-                                      const unsigned int stride,
-                                      const unsigned int padding,
-                                      const unsigned int dilation,
-                                      const unsigned int groups) {
-  int ofm_b = blockIdx.y * blockDim.y + threadIdx.y;
-  int ofm_c = blockIdx.x * blockDim.x + threadIdx.x;
+__global__ void cuda_im2col(float *ifm_p,
+                            const unsigned int ifm_batch,
+                            const unsigned int ifm_channel,
+                            const unsigned int ifm_height,
+                            const unsigned int ifm_width,
+                            const unsigned int ifm_size,
+                            float *wgt_p,
+                            const unsigned int wgt_batch,
+                            const unsigned int wgt_channel,
+                            const unsigned int wgt_height,
+                            const unsigned int wgt_width,
+                            const unsigned int wgt_size,
+                            float *bias_p,
+                            const unsigned int bias_size,
+                            float *ofm_p,
+                            const unsigned int ofm_batch,
+                            const unsigned int ofm_channel,
+                            const unsigned int ofm_height,
+                            const unsigned int ofm_width,
+                            const unsigned int ofm_size,
+                            unsigned int stride,
+                            unsigned int padding,
+                            unsigned int dilation,
+                            unsigned int groups,
+                            float *ifm_im2col,
+                            unsigned int ifm_im2col_size) {
+  int ofm_b = blockIdx.z * blockDim.z + threadIdx.z;
+  int wgt_s = blockIdx.y * blockDim.y + threadIdx.y;
+  int ofm_s = blockIdx.x * blockDim.x + threadIdx.x;
+  const int wgt_im2col_size = wgt_channel * wgt_height * wgt_width;
+  const int channel_im2col_size = ofm_height * ofm_width;
 
-  // for (int ofm_b = 0; ofm_b < ofm_batch; ofm_b++) {
-  // for (int ofm_c = 0; ofm_c < ofm_channel; ofm_c++) {
-  if (ofm_b >= 0 && ofm_b < ofm_batch) {
-    if (ofm_c >= 0 && ofm_c < ofm_channel) {
-      for (int ofm_h = 0; ofm_h < ofm_height; ofm_h++) {
-        for (int ofm_w = 0; ofm_w < ofm_width; ofm_w++) {
-          float temp = 0.0f;
-          int ofm_idx = ofm_b * ofm_channel * ofm_height * ofm_width +
-                        ofm_c * ofm_height * ofm_width + ofm_h * ofm_width +
-                        ofm_w;
-          for (int wgt_b = ofm_c, wgt_c = 0; wgt_c < wgt_channel; wgt_c++) {
-            for (int wgt_h = 0; wgt_h < wgt_height; wgt_h++) {
-              for (int wgt_w = 0; wgt_w < wgt_width; wgt_w++) {
-                int ifm_b = ofm_b;
-                int ifm_c = wgt_c;
-                int ifm_h = (ofm_h * stride - padding) + wgt_h * dilation;
-                int ifm_w = (ofm_w * stride - padding) + wgt_w * dilation;
-                if ((ifm_h >= 0 && ifm_h < ifm_height) &&
-                    (ifm_w >= 0 && ifm_w < ifm_width)) {
-                  int ifm_idx = ifm_b * ifm_channel * ifm_height * ifm_width +
-                                ifm_c * ifm_height * ifm_width +
-                                ifm_h * ifm_width + ifm_w;
-                  int wgt_idx = wgt_b * wgt_channel * wgt_height * wgt_width +
-                                wgt_c * wgt_height * wgt_width +
-                                wgt_h * wgt_width + wgt_w;
-                  temp += ifm[ifm_idx] * wgt[wgt_idx];
-                }
-              }
-            }
-          }
-          temp += bias[ofm_c];
-          ofm[ofm_idx] = temp;
-        }
-      }
+  if (ofm_b >= 0 && ofm_b < ofm_batch && wgt_s >= 0 &&
+      wgt_s < wgt_im2col_size && ofm_s >= 0 && ofm_s < channel_im2col_size) {
+    const int wgt_c = wgt_s / wgt_height / wgt_width;
+    const int wgt_h = (wgt_s / wgt_width) % wgt_height;
+    const int wgt_w = wgt_s % wgt_width;
+    const int ofm_h = (ofm_s / ofm_width) % ofm_height;
+    const int ofm_w = ofm_s % ofm_width;
+    int ifm_im2col_idx = ofm_b * wgt_im2col_size * channel_im2col_size +
+                         wgt_s * channel_im2col_size + ofm_s;
+    int ifm_b = ofm_b;
+    int ifm_c = wgt_c;
+    int ifm_h = (ofm_h * stride - padding) + wgt_h * dilation;
+    int ifm_w = (ofm_w * stride - padding) + wgt_w * dilation;
+    if ((ifm_h >= 0 && ifm_h < ifm_height) &&
+        (ifm_w >= 0 && ifm_w < ifm_width)) {
+      int ifm_idx = ifm_b * ifm_channel * ifm_height * ifm_width +
+                    ifm_c * ifm_height * ifm_width + ifm_h * ifm_width + ifm_w;
+      ifm_im2col[ifm_im2col_idx] = ifm_p[ifm_idx];
     }
+  }
+}
+
+__global__ void cuda_gemm(float *ifm_p,
+                          const unsigned int ifm_batch,
+                          const unsigned int ifm_channel,
+                          const unsigned int ifm_height,
+                          const unsigned int ifm_width,
+                          const unsigned int ifm_size,
+                          float *wgt_p,
+                          const unsigned int wgt_batch,
+                          const unsigned int wgt_channel,
+                          const unsigned int wgt_height,
+                          const unsigned int wgt_width,
+                          const unsigned int wgt_size,
+                          float *bias_p,
+                          const unsigned int bias_size,
+                          float *ofm_p,
+                          const unsigned int ofm_batch,
+                          const unsigned int ofm_channel,
+                          const unsigned int ofm_height,
+                          const unsigned int ofm_width,
+                          const unsigned int ofm_size,
+                          unsigned int stride,
+                          unsigned int padding,
+                          unsigned int dilation,
+                          unsigned int groups,
+                          float *ifm_im2col,
+                          unsigned int ifm_im2col_size) {
+  int ofm_b = blockIdx.z * blockDim.z + threadIdx.z;
+  int ofm_c = blockIdx.y * blockDim.y + threadIdx.y;
+  int ofm_s = blockIdx.x * blockDim.x + threadIdx.x;
+  const int wgt_im2col_size = wgt_channel * wgt_height * wgt_width;
+  const int channel_im2col_size = ofm_height * ofm_width;
+  if (ofm_b >= 0 && ofm_b < ofm_batch && ofm_c >= 0 && ofm_c < ofm_channel &&
+      ofm_s >= 0 && ofm_s < channel_im2col_size) {
+    float temp = 0.0f;
+    const int ofm_h = (ofm_s / ofm_width) % ofm_height;
+    const int ofm_w = ofm_s % ofm_width;
+    for (int wgt_s = 0; wgt_s < wgt_im2col_size; wgt_s++) {
+      const int wgt_c = wgt_s / wgt_height / wgt_width;
+      const int wgt_h = (wgt_s / wgt_width) % wgt_height;
+      const int wgt_w = wgt_s % wgt_width;
+      int ifm_im2col_idx = ofm_b * wgt_im2col_size * channel_im2col_size +
+                           wgt_s * channel_im2col_size + ofm_s;
+      temp +=
+          ifm_im2col[ifm_im2col_idx] * wgt_p[ofm_c * wgt_im2col_size + wgt_s];
+    }
+    int ofm_idx = ofm_b * ofm_channel * channel_im2col_size +
+                  ofm_c * channel_im2col_size + ofm_s;
+    ofm_p[ofm_idx] = temp;
   }
 }
 
@@ -431,12 +474,7 @@ void conv2d_optimized(float *ifm_p,
   cudaMemcpy(bias_d, bias_p, bias_size * sizeof(float), cudaMemcpyHostToDevice);
 
   dim3 block(0);  // blockDim: # of threads
-  block.x = 1;
-  block.y = 1;
-
-  dim3 grid(0);  // gridDim: # of blocks
-  grid.x = (ofm_channel + block.x - 1) / block.x;
-  grid.y = (ofm_batch + block.y - 1) / block.y;
+  dim3 grid(0);   // gridDim: # of blocks
 
   std::cout << "block(x,y,z): "
             << "(" << block.x << "," << block.y << "," << block.z << ")"
@@ -445,27 +483,80 @@ void conv2d_optimized(float *ifm_p,
             << "(" << grid.x << "," << grid.y << "," << grid.z << ")"
             << std::endl;
 
-  cuda_conv2d_optimized<<<grid, block>>>(ofm_d,
-                                         ifm_d,
-                                         wgt_d,
-                                         bias_d,
-                                         ofm_batch,
-                                         ofm_channel,
-                                         ofm_height,
-                                         ofm_width,
-                                         ifm_batch,
-                                         ifm_channel,
-                                         ifm_height,
-                                         ifm_width,
-                                         wgt_batch,
-                                         wgt_channel,
-                                         wgt_height,
-                                         wgt_width,
-                                         bias_size,
-                                         stride,
-                                         padding,
-                                         dilation,
-                                         groups);
+  int ifm_im2col_size =
+      ofm_batch * wgt_channel * wgt_height * wgt_width * ofm_height * ofm_width;
+  float *ifm_im2col;
+  cudaMalloc(&ifm_im2col, ifm_im2col_size * sizeof(float));
+  cudaMemset(&ifm_im2col, 0, ifm_im2col_size * sizeof(float));
+
+  const int wgt_im2col_size = wgt_channel * wgt_height * wgt_width;
+  const int channel_im2col_size = ofm_height * ofm_width;
+  block.x = 1;
+  block.y = 1;
+  block.z = 1;
+  grid.x = (channel_im2col_size + block.x - 1) / block.x;
+  grid.y = (wgt_im2col_size + block.y - 1) / block.y;
+  grid.z = (ofm_batch + block.z - 1) / block.z;
+
+  cuda_im2col<<<grid, block>>>(ifm_d,
+                               ifm_batch,
+                               ifm_channel,
+                               ifm_height,
+                               ifm_width,
+                               ifm_size,
+                               wgt_d,
+                               wgt_batch,
+                               wgt_channel,
+                               wgt_height,
+                               wgt_width,
+                               wgt_size,
+                               bias_d,
+                               bias_size,
+                               ofm_d,
+                               ofm_batch,
+                               ofm_channel,
+                               ofm_height,
+                               ofm_width,
+                               ofm_size,
+                               stride,
+                               padding,
+                               dilation,
+                               groups,
+                               ifm_im2col,
+                               ifm_im2col_size);
+
+  block.x = 1;
+  block.y = 1;
+  block.z = 1;
+  grid.x = (channel_im2col_size + block.x - 1) / block.x;
+  grid.y = (ofm_channel + block.y - 1) / block.y;
+  grid.z = (ofm_batch + block.z - 1) / block.z;
+  cuda_gemm<<<grid, block>>>(ifm_d,
+                             ifm_batch,
+                             ifm_channel,
+                             ifm_height,
+                             ifm_width,
+                             ifm_size,
+                             wgt_d,
+                             wgt_batch,
+                             wgt_channel,
+                             wgt_height,
+                             wgt_width,
+                             wgt_size,
+                             bias_d,
+                             bias_size,
+                             ofm_d,
+                             ofm_batch,
+                             ofm_channel,
+                             ofm_height,
+                             ofm_width,
+                             ofm_size,
+                             stride,
+                             padding,
+                             dilation,
+                             groups,
+                             ifm_im2col,
+                             ifm_im2col_size);
 
   // sync and get output
   cudaDeviceSynchronize();
@@ -476,6 +567,7 @@ void conv2d_optimized(float *ifm_p,
   cudaFree(wgt_d);
   cudaFree(bias_d);
   cudaFree(ofm_d);
+  cudaFree(ifm_im2col);
 }
 
 torch::Tensor conv2d(torch::Tensor &ifm,
