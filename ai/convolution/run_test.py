@@ -35,6 +35,8 @@ dilation = DILATION
 groups = GROUPS
 print("\r")
 
+## unfold
+"""
 t = time.perf_counter()
 im2col_ifm = nn.unfold(ifm, (WGT_H, WGT_W),
                        dilation=dilation,
@@ -73,6 +75,7 @@ print("padding:\t", padding)
 print("dilation:\t", dilation)
 print("groups:\t\t", groups)
 print("\r")
+"""
 
 ## pdb.set_trace()
 
