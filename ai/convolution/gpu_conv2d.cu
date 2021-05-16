@@ -360,6 +360,7 @@ __global__ void cuda_im2col(float *ifm_p,
                             unsigned int groups,
                             float *ifm_im2col,
                             unsigned int ifm_im2col_size) {
+  __shared__ float ifmShared[1024];
   int ofm_b = blockIdx.z * blockDim.z + threadIdx.z;
   int wgt_s = blockIdx.y * blockDim.y + threadIdx.y;
   int ofm_s = blockIdx.x * blockDim.x + threadIdx.x;
@@ -383,7 +384,10 @@ __global__ void cuda_im2col(float *ifm_p,
         (ifm_w >= 0 && ifm_w < ifm_width)) {
       int ifm_idx = ifm_b * ifm_channel * ifm_height * ifm_width +
                     ifm_c * ifm_height * ifm_width + ifm_h * ifm_width + ifm_w;
-      ifm_im2col[ifm_im2col_idx] = ifm_p[ifm_idx];
+      // printf("im2col(%d, %d)\n", ifm_idx, threadIdx.x);
+      ifmShared[threadIdx.x] = ifm_p[ifm_idx];
+      __syncthreads();
+      ifm_im2col[ifm_im2col_idx] = ifmShared[threadIdx.x];
     }
   }
 }
@@ -414,6 +418,7 @@ __global__ void cuda_gemm(float *ifm_p,
                           unsigned int groups,
                           float *ifm_im2col,
                           unsigned int ifm_im2col_size) {
+  __shared__ float ifmShared[1024];
   int ofm_b = blockIdx.z * blockDim.z + threadIdx.z;
   int ofm_c = blockIdx.y * blockDim.y + threadIdx.y;
   int ofm_s = blockIdx.x * blockDim.x + threadIdx.x;
@@ -430,8 +435,10 @@ __global__ void cuda_gemm(float *ifm_p,
       const int wgt_w = wgt_s % wgt_width;
       int ifm_im2col_idx = ofm_b * wgt_im2col_size * channel_im2col_size +
                            wgt_s * channel_im2col_size + ofm_s;
-      temp +=
-          ifm_im2col[ifm_im2col_idx] * wgt_p[ofm_c * wgt_im2col_size + wgt_s];
+      ifmShared[threadIdx.x] = ifm_im2col[ifm_im2col_idx];
+      __syncthreads();
+      // printf("gemm(%d, %d)\n", ifm_im2col_idx, threadIdx.x);
+      temp += ifmShared[threadIdx.x] * wgt_p[ofm_c * wgt_im2col_size + wgt_s];
     }
     int ofm_idx = ofm_b * ofm_channel * channel_im2col_size +
                   ofm_c * channel_im2col_size + ofm_s;
@@ -484,7 +491,7 @@ void conv2d_optimized(float *ifm_p,
 
   const int wgt_im2col_size = wgt_channel * wgt_height * wgt_width;
   const int channel_im2col_size = ofm_height * ofm_width;
-  block.x = 1;
+  block.x = channel_im2col_size;
   block.y = 1;
   block.z = 1;
   grid.x = (channel_im2col_size + block.x - 1) / block.x;
@@ -524,7 +531,7 @@ void conv2d_optimized(float *ifm_p,
                                ifm_im2col,
                                ifm_im2col_size);
 
-  block.x = 1;
+  block.x = channel_im2col_size;
   block.y = 1;
   block.z = 1;
   grid.x = (channel_im2col_size + block.x - 1) / block.x;
