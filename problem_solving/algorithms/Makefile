@@ -1,7 +1,7 @@
-FLAGS=
+FLAGS=--std=c++11
 DEBUG=-Wall -O0 -g
 
-all: malloc matrix scanf bubble_sort merge_sort dfs
+all: malloc matrix scanf Sort merge_sort dfs
 
 malloc: malloc.c
 	gcc -o bin.malloc malloc.c $(FLAGS) $(DEBUG)
@@ -9,8 +9,8 @@ malloc: malloc.c
 matrix: matrix.c
 	gcc -o bin.matrix matrix.c $(FLAGS) $(DEBUG)
 
-bubble_sort: bubble_sort.c
-	gcc -o bin.bubble_sort bubble_sort.c $(FLAGS) $(DEBUG)
+Sort: Sort.cc
+	clang++ -o bin.Sort Sort.cc $(FLAGS) $(DEBUG)
 
 merge_sort: merge_sort.c
 	gcc -o bin.merge_sort merge_sort.c $(FLAGS) $(DEBUG)
