@@ -103,6 +103,54 @@ void quickSort(std::vector<int> &arr, int left, int right) {
   }
 }
 
+//// Time Complexity: O(n*Log(n))
+void merge(std::vector<int> &arr, int left, int mid, int right) {
+  int leftSize = mid - left + 1;
+  int rightSize = right - (mid + 1) + 1;
+
+  int leftArr[leftSize];
+  int rightArr[rightSize];
+  for (int i = 0; i < leftSize; i++) {
+    leftArr[i] = arr[i + left];
+  }
+  for (int i = 0; i < rightSize; i++) {
+    rightArr[i] = arr[i + mid + 1];
+  }
+
+  int i = 0;
+  int j = 0;
+  int k = left;
+  while (i < leftSize && j < rightSize) {
+    if (leftArr[i] < rightArr[j]) {
+      arr[k] = leftArr[i];
+      i++;
+    } else {
+      arr[k] = rightArr[j];
+      j++;
+    }
+    k++;
+  }
+  while (i < leftSize) {
+    arr[k] = leftArr[i];
+    i++;
+    k++;
+  }
+  while (j < rightSize) {
+    arr[k] = rightArr[j];
+    j++;
+    k++;
+  }
+}
+void mergeSort(std::vector<int> &arr, int left, int right) {
+  if (left < right) {
+    int mid = (left + right) / 2;
+    mergeSort(arr, left, mid);
+    mergeSort(arr, mid + 1, right);
+    merge(arr, left, mid, right);
+  }
+  printArray(arr);
+}
+
 int main(void) {
   std::vector<int> arr(10);
 
@@ -124,7 +172,12 @@ int main(void) {
   std::cout << "\nOrigin Array: " << std::endl;
   initArray(arr);
   std::cout << "\nQuick Sorting ..." << std::endl;
-  quickSort(arr, 0, arr.size());
+  quickSort(arr, 0, arr.size() - 1);
+
+  std::cout << "\nOrigin Array: " << std::endl;
+  initArray(arr);
+  std::cout << "\nMerge Sorting ..." << std::endl;
+  mergeSort(arr, 0, arr.size() - 1);
 
   return 0;
 }
