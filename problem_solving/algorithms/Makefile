@@ -3,11 +3,11 @@ DEBUG=-Wall -O0 -g
 
 all: malloc matrix scanf Sort merge_sort dfs
 
-malloc: malloc.c
-	gcc -o bin.malloc malloc.c $(FLAGS) $(DEBUG)
+malloc: malloc.cc
+	gcc -o bin.malloc malloc.cc $(FLAGS) $(DEBUG)
 
-matrix: matrix.c
-	gcc -o bin.matrix matrix.c $(FLAGS) $(DEBUG)
+matrix: matrix.cc
+	gcc -o bin.matrix matrix.cc $(FLAGS) $(DEBUG)
 
 Sort: Sort.cc
 	clang++ -o bin.Sort Sort.cc $(FLAGS) $(DEBUG)
