@@ -15,8 +15,7 @@ else
     DEBUG='-Wall -O0 -g'
     CC=clang++
     rm -rf bin.*
-    $CC -o bin.$1 $1 $FLAGS $DEBUG
-    ./bin.$1
+    $CC -o bin.$1 $1 $FLAGS $DEBUG && ./bin.$1
     rm -rf bin.*
   fi
 fi
