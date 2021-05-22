@@ -72,15 +72,15 @@ void insertionSort(std::vector<int> &arr) {
 
 //// Time Complexity: O(n*Log(n))
 void quickSort(std::vector<int> &arr, int left, int right) {
-  int pivot = (left + right) / 2;
+  int pivot = arr[(left + right) / 2];
   int i = left;
   int j = right;
 
   while (i <= j) {
-    while (arr[i] < arr[pivot]) {
+    while (arr[i] < pivot) {
       i++;
     }
-    while (arr[j] > arr[pivot]) {
+    while (arr[j] > pivot) {
       j--;
     }
     if (i <= j) {
