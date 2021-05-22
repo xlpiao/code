@@ -83,14 +83,17 @@ void quickSort(std::vector<int> &arr, int left, int right) {
     while (arr[j] > pivot) {
       j--;
     }
-    if (i <= j) {
+    if (i < j) {
       int temp = arr[i];
       arr[i] = arr[j];
       arr[j] = temp;
+    }
+    if (i <= j) {
       i++;
       j--;
     }
   }
+  printArray(arr);
 
   if (left < j) {
     quickSort(arr, left, j);
@@ -98,7 +101,6 @@ void quickSort(std::vector<int> &arr, int left, int right) {
   if (i < right) {
     quickSort(arr, i, right);
   }
-  printArray(arr);
 }
 
 int main(void) {
