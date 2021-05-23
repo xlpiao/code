@@ -1,8 +1,8 @@
 /**
- * File              : stack_dfs_maze.cpp
+ * File              : StackDFSMaze.cc
  * Author            : Xianglan Piao <xianglan0502@gmail.com>
  * Date              : 2018.08.11
- * Last Modified Date: 2018.08.12
+ * Last Modified Date: 2021.05.23
  * Last Modified By  : Xianglan Piao <xianglan0502@gmail.com>
  */
 #include <iostream>

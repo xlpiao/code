@@ -1,8 +1,8 @@
 /**
- * File              : queue_bfs_maze.cpp
+ * File              : QueueBFSMaze.cc
  * Author            : Xianglan Piao <xianglan0502@gmail.com>
  * Date              : 2018.08.11
- * Last Modified Date: 2018.08.12
+ * Last Modified Date: 2021.05.23
  * Last Modified By  : Xianglan Piao <xianglan0502@gmail.com>
  */
 #include <iostream>
@@ -21,8 +21,7 @@ struct POS {
 
 void print_queue(std::queue<POS> q) {
   while (!q.empty()) {
-    cout << q.front().x << " " << q.front().y << " " << q.front().len
-         << endl;
+    cout << q.front().x << " " << q.front().y << " " << q.front().len << endl;
     q.pop();
   }
 }
