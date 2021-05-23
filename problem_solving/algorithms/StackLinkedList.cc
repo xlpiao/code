@@ -10,7 +10,7 @@ struct StackNode {
 };
 
 struct Stack {
-  int length;
+  int len;
   struct StackNode* root;
 };
 
@@ -48,7 +48,7 @@ int peek(struct StackNode* top) {
 
 int main(void) {
   struct Stack* stack = (struct Stack*)malloc(sizeof(struct Stack));
-  stack->length = 0;
+  stack->len = 0;
   stack->root = NULL;
 
   push(stack->root, 10);

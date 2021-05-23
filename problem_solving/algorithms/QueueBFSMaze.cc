@@ -16,12 +16,12 @@ char line[6];
 struct POS {
   int x;
   int y;
-  int length;
+  int len;
 };
 
 void print_queue(std::queue<POS> q) {
   while (!q.empty()) {
-    cout << q.front().x << " " << q.front().y << " " << q.front().length
+    cout << q.front().x << " " << q.front().y << " " << q.front().len
          << endl;
     q.pop();
   }
@@ -51,10 +51,10 @@ int main(void) {
   while (!path.empty()) {
     cout << "Debug: -----Start-----" << endl;
     cout << "Visit [" << x << ", " << y << "], "
-         << "length: " << len << endl;
+         << "len: " << len << endl;
     x = path.front().x;
     y = path.front().y;
-    len = path.front().length;
+    len = path.front().len;
     path.pop();
 
     if (x == row - 1 && y == col - 1) {

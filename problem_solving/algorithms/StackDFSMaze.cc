@@ -16,12 +16,12 @@ char line[6];
 struct POS {
   int x;
   int y;
-  int length;
+  int len;
 };
 
 void print_stack(stack<POS> s) {
   while (!s.empty()) {
-    cout << s.top().x << " " << s.top().y << " " << s.top().length << endl;
+    cout << s.top().x << " " << s.top().y << " " << s.top().len << endl;
     s.pop();
   }
 }
@@ -50,10 +50,10 @@ int main(void) {
   while (!path.empty()) {
     cout << "Debug: -----Start-----" << endl;
     cout << "Visit [" << x << ", " << y << "], "
-         << "length: " << len << endl;
+         << "len: " << len << endl;
     x = path.top().x;
     y = path.top().y;
-    len = path.top().length;
+    len = path.top().len;
     path.pop();
 
     if (x == row - 1 && y == col - 1) {

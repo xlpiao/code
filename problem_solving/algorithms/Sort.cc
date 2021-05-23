@@ -3,18 +3,18 @@
 #include <vector>
 
 void printArray(std::vector<int> &arr) {
-  int length = arr.size();
+  int len = arr.size();
 
-  for (int i = 0; i < length; i++) {
+  for (int i = 0; i < len; i++) {
     printf("%d ", arr[i]);
   }
   printf("\n");
 }
 
 void initArray(std::vector<int> &arr) {
-  int length = arr.size();
+  int len = arr.size();
 
-  for (int i = 0; i < length; i++) {
+  for (int i = 0; i < len; i++) {
     arr[i] = 10 + std::rand() / ((RAND_MAX + 1u) / 6);
   }
   printArray(arr);
@@ -22,10 +22,10 @@ void initArray(std::vector<int> &arr) {
 
 //// Time Complexity: O(n^2)
 void bubbleSort(std::vector<int> &arr) {
-  int length = arr.size();
+  int len = arr.size();
 
-  for (int i = 1; i < length; i++) {
-    for (int j = 0; j < length - i; j++) {
+  for (int i = 1; i < len; i++) {
+    for (int j = 0; j < len - i; j++) {
       if (arr[j] > arr[j + 1]) {
         int temp = arr[j];
         arr[j] = arr[j + 1];
@@ -38,11 +38,11 @@ void bubbleSort(std::vector<int> &arr) {
 
 //// Time Complexity: O(n^2)
 void selectionSort(std::vector<int> &arr) {
-  int length = arr.size();
+  int len = arr.size();
 
-  for (int i = 0; i < length - 1; i++) {
+  for (int i = 0; i < len - 1; i++) {
     int minIdx = i;
-    for (int j = i + 1; j < length; j++) {
+    for (int j = i + 1; j < len; j++) {
       if (arr[j] < arr[minIdx]) {
         minIdx = j;
       }
@@ -56,9 +56,9 @@ void selectionSort(std::vector<int> &arr) {
 
 //// Time Complexity: O(n^2)
 void insertionSort(std::vector<int> &arr) {
-  int length = arr.size();
+  int len = arr.size();
 
-  for (int i = 0; i < length - 1; i++) {
+  for (int i = 0; i < len - 1; i++) {
     for (int j = i + 1; j > 0; j--) {
       if (arr[j] < arr[j - 1]) {
         int temp = arr[j];
