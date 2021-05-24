@@ -7,7 +7,6 @@
  */
 #include <iostream>
 #include <stack>
-using namespace std;
 
 char maze[6][6];
 int visited[6][6];
@@ -19,9 +18,10 @@ struct POS {
   int len;
 };
 
-void print_stack(stack<POS> s) {
+void print(std::stack<POS> s) {
   while (!s.empty()) {
-    cout << s.top().x << " " << s.top().y << " " << s.top().len << endl;
+    std::cout << s.top().x << " " << s.top().y << " " << s.top().len
+              << std::endl;
     s.pop();
   }
 }
@@ -35,26 +35,26 @@ int main(void) {
       maze[i][j] = line[j];
       visited[i][j] = 0;
     }
-    cout << line << endl;
+    std::cout << line << std::endl;
   }
 
-  stack<POS> path;
+  std::stack<POS> s;
   int x = 0, y = 0, len = 1;
   POS begin = {x, y, len};
 
-  path.push(begin);
+  s.push(begin);
   visited[0][0] = 1;
 
   int shortest = 0;
 
-  while (!path.empty()) {
-    cout << "Debug: -----Start-----" << endl;
-    cout << "Visit [" << x << ", " << y << "], "
-         << "len: " << len << endl;
-    x = path.top().x;
-    y = path.top().y;
-    len = path.top().len;
-    path.pop();
+  while (!s.empty()) {
+    std::cout << "Debug: -----Start-----" << std::endl;
+    std::cout << "Visit [" << x << ", " << y << "], "
+              << "len: " << len << std::endl;
+    x = s.top().x;
+    y = s.top().y;
+    len = s.top().len;
+    s.pop();
 
     if (x == row - 1 && y == col - 1) {
       shortest = len;
@@ -64,36 +64,36 @@ int main(void) {
     /* up*/
     if (x - 1 >= 0 && maze[x - 1][y] == '1' && visited[x - 1][y] == 0) {
       POS up = {x - 1, y, len + 1};
-      path.push(up);
+      s.push(up);
       visited[x - 1][y] = 1;
-      cout << "top" << endl;
+      std::cout << "up" << std::endl;
     }
     /* down */
     if (x + 1 < row && maze[x + 1][y] == '1' && visited[x + 1][y] == 0) {
       POS down = {x + 1, y, len + 1};
-      path.push(down);
+      s.push(down);
       visited[x + 1][y] = 1;
-      cout << "down" << endl;
+      std::cout << "down" << std::endl;
     }
     /* left */
     if (y - 1 >= 0 && maze[x][y - 1] == '1' && visited[x][y - 1] == 0) {
       POS left = {x, y - 1, len + 1};
-      path.push(left);
+      s.push(left);
       visited[x][y - 1] = 1;
-      cout << "left" << endl;
+      std::cout << "left" << std::endl;
     }
     /* right*/
     if (y + 1 < col && maze[x][y + 1] == '1' && visited[x][y + 1] == 0) {
       POS right = {x, y + 1, len + 1};
-      path.push(right);
+      s.push(right);
       visited[x][y + 1] = 1;
-      cout << "right" << endl;
+      std::cout << "right" << std::endl;
     }
-    print_stack(path);
-    cout << "Debug: -----End-----" << endl;
+    print(s);
+    std::cout << "Debug: -----End-----" << std::endl;
   }
 
-  cout << "The shortest path: " << shortest << endl;
+  std::cout << "The shortest s: " << shortest << std::endl;
 
   return 0;
 }

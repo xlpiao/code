@@ -7,7 +7,6 @@
  */
 #include <iostream>
 #include <queue>
-using namespace std;
 
 char maze[6][6];
 int visited[6][6];
@@ -19,9 +18,10 @@ struct POS {
   int len;
 };
 
-void print_queue(std::queue<POS> q) {
+void print(std::queue<POS> q) {
   while (!q.empty()) {
-    cout << q.front().x << " " << q.front().y << " " << q.front().len << endl;
+    std::cout << q.front().x << " " << q.front().y << " " << q.front().len
+              << std::endl;
     q.pop();
   }
 }
@@ -35,26 +35,26 @@ int main(void) {
       maze[i][j] = line[j];
       visited[i][j] = 0;
     }
-    cout << line << endl;
+    std::cout << line << std::endl;
   }
 
-  queue<POS> path;
+  std::queue<POS> q;
   int x = 0, y = 0, len = 1;
   POS begin = {x, y, len};
 
-  path.push(begin);
+  q.push(begin);
   visited[0][0] = 1;
 
   int shortest = 0;
 
-  while (!path.empty()) {
-    cout << "Debug: -----Start-----" << endl;
-    cout << "Visit [" << x << ", " << y << "], "
-         << "len: " << len << endl;
-    x = path.front().x;
-    y = path.front().y;
-    len = path.front().len;
-    path.pop();
+  while (!q.empty()) {
+    std::cout << "Debug: -----Start-----" << std::endl;
+    std::cout << "Visit [" << x << ", " << y << "], "
+              << "len: " << len << std::endl;
+    x = q.front().x;
+    y = q.front().y;
+    len = q.front().len;
+    q.pop();
 
     if (x == row - 1 && y == col - 1) {
       shortest = len;
@@ -64,36 +64,36 @@ int main(void) {
     /* up*/
     if (x - 1 >= 0 && maze[x - 1][y] == '1' && visited[x - 1][y] == 0) {
       POS up = {x - 1, y, len + 1};
-      path.push(up);
+      q.push(up);
       visited[x - 1][y] = 1;
-      cout << "top" << endl;
+      std::cout << "up" << std::endl;
     }
     /* down */
     if (x + 1 < row && maze[x + 1][y] == '1' && visited[x + 1][y] == 0) {
       POS down = {x + 1, y, len + 1};
-      path.push(down);
+      q.push(down);
       visited[x + 1][y] = 1;
-      cout << "down" << endl;
+      std::cout << "down" << std::endl;
     }
     /* left */
     if (y - 1 >= 0 && maze[x][y - 1] == '1' && visited[x][y - 1] == 0) {
       POS left = {x, y - 1, len + 1};
-      path.push(left);
+      q.push(left);
       visited[x][y - 1] = 1;
-      cout << "left" << endl;
+      std::cout << "left" << std::endl;
     }
     /* right*/
     if (y + 1 < col && maze[x][y + 1] == '1' && visited[x][y + 1] == 0) {
       POS right = {x, y + 1, len + 1};
-      path.push(right);
+      q.push(right);
       visited[x][y + 1] = 1;
-      cout << "right" << endl;
+      std::cout << "right" << std::endl;
     }
-    print_queue(path);
-    cout << "Debug: -----End-----" << endl;
+    print(q);
+    std::cout << "Debug: -----End-----" << std::endl;
   }
 
-  cout << "The shortest path: " << shortest << endl;
+  std::cout << "The shortest path: " << shortest << std::endl;
 
   return 0;
 }
