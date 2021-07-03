@@ -1,7 +1,6 @@
 class Solution {
 public:
   vector<int> plusOne(vector<int>& digits) {
-    std::vector<int> ret;
     int carry = 0;
     for (int i = digits.size()-1; i >= 0; i--) {
       if(i == digits.size() - 1) {
@@ -17,11 +16,9 @@ public:
     }
     
     if (carry != 0) {
-      ret.push_back(carry);
+      digits.insert(digits.begin(), carry);
     }
-    for(int i = 0; i < digits.size(); i++) {
-      ret.push_back(digits[i]);
-    }
-    return ret;
+    
+    return digits;
   }
 };
