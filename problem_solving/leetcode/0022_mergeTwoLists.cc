@@ -14,10 +14,10 @@ public:
     ListNode* n1 = l1;
     ListNode* n2 = l2;
 
-    while(n1 || n2) {
-      if(n1 && n2 && n1->val > n2->val) {
-        n1->val = n2->val;
+    while(n2) {
+      if(n1->val >=n2->val) {
         n1->next = n1;
+        n1->val = n2->val;
         n2 = n2->next;
       }
       n1 = n1->next;
