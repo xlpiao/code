@@ -1,9 +1,9 @@
 /**
  * File              : 2_1.cc
- * Author            : Xianglan Piao <xianglan0502@gmail.com>
+ * Author            : Xianglan Piao <lanxlpiao@gmail.com>
  * Date              : 2018.08.11
  * Last Modified Date: 2019.04.29
- * Last Modified By  : Xianglan Piao <xianglan0502@gmail.com>
+ * Last Modified By  : Xianglan Piao <lanxlpiao@gmail.com>
  */
 
 /* Find value that occurs in odd number of elements.

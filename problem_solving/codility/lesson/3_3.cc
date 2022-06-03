@@ -1,9 +1,9 @@
 /**
  * File              : 3_3.cc
- * Author            : Xianglan Piao <xianglan0502@gmail.com>
+ * Author            : Xianglan Piao <lanxlpiao@gmail.com>
  * Date              : 2019.05.01
  * Last Modified Date: 2019.05.01
- * Last Modified By  : Xianglan Piao <xianglan0502@gmail.com>
+ * Last Modified By  : Xianglan Piao <lanxlpiao@gmail.com>
  */
 
 /* Minimize the value |(A[0] + ... + A[P-1]) - (A[P] + ... + A[N-1])|.

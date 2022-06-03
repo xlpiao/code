@@ -1,9 +1,9 @@
 /**
  * File              : stack_dfs_maze.cpp
- * Author            : Xianglan Piao <xianglan0502@gmail.com>
+ * Author            : Xianglan Piao <lanxlpiao@gmail.com>
  * Date              : 2018.08.11
  * Last Modified Date: 2018.08.12
- * Last Modified By  : Xianglan Piao <xianglan0502@gmail.com>
+ * Last Modified By  : Xianglan Piao <lanxlpiao@gmail.com>
  */
 #include <iostream>
 #include <stack>

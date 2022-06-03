@@ -1,6 +1,6 @@
 /*
  * Gemm.cc
- * Copyright (c) 2016 Xianglan Piao <xianglan0502@gmail.com>
+ * Copyright (c) 2016 Xianglan Piao <lanxlpiao@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

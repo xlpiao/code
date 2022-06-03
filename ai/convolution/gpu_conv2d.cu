@@ -1,9 +1,9 @@
 /**
  * File              : gpu_conv2d.cu
- * Author            : Xianglan Piao <xianglan0502@gmail.com>
+ * Author            : Xianglan Piao <lanxlpiao@gmail.com>
  * Date              : 2020.06.16
  * Last Modified Date: 2020.07.31
- * Last Modified By  : Xianglan Piao <xianglan0502@gmail.com>
+ * Last Modified By  : Xianglan Piao <lanxlpiao@gmail.com>
  * NOTE:             : cuda conv2d
  */
 

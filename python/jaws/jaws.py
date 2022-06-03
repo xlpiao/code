@@ -9,7 +9,7 @@ import os, sys
 # Pretty Parsing
 
 __author__ = "Xianglan Piao"
-__email__ = "xianglan0502@gmail.com"
+__email__ = "lanxlpiao@gmail.com"
 __version__ = "1.0.0"
 
 def main(argv):

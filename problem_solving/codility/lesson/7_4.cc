@@ -1,9 +1,9 @@
 /**
  * File              : 7_4.cc
- * Author            : Xianglan Piao <xianglan0502@gmail.com>
+ * Author            : Xianglan Piao <lanxlpiao@gmail.com>
  * Date              : 2019.05.06
  * Last Modified Date: 2019.05.08
- * Last Modified By  : Xianglan Piao <xianglan0502@gmail.com>
+ * Last Modified By  : Xianglan Piao <lanxlpiao@gmail.com>
  */
 
 /* Description:

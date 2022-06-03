@@ -1,9 +1,9 @@
 /**
  * File              : Sort.cc
- * Author            : Xianglan Piao <xianglan0502@gmail.com>
+ * Author            : Xianglan Piao <lanxlpiao@gmail.com>
  * Date              : 2021.05.23
  * Last Modified Date: 2021.05.23
- * Last Modified By  : Xianglan Piao <xianglan0502@gmail.com>
+ * Last Modified By  : Xianglan Piao <lanxlpiao@gmail.com>
  */
 #include <cstdlib>
 #include <iostream>

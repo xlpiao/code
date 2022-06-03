@@ -1,9 +1,9 @@
 /**
  * File              : 3_2.cc
- * Author            : Xianglan Piao <xianglan0502@gmail.com>
+ * Author            : Xianglan Piao <lanxlpiao@gmail.com>
  * Date              : 2019.04.29
  * Last Modified Date: 2019.04.29
- * Last Modified By  : Xianglan Piao <xianglan0502@gmail.com>
+ * Last Modified By  : Xianglan Piao <lanxlpiao@gmail.com>
  */
 
 /* Find the missing element in a given permutation.

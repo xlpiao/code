@@ -1,9 +1,9 @@
 /**
  * File              : cpu_conv2d.cc
- * Author            : Xianglan Piao <xianglan0502@gmail.com>
+ * Author            : Xianglan Piao <lanxlpiao@gmail.com>
  * Date              : 2020.06.15
  * Last Modified Date: 2021.05.09
- * Last Modified By  : Xianglan Piao <xianglan0502@gmail.com>
+ * Last Modified By  : Xianglan Piao <lanxlpiao@gmail.com>
  */
 
 /* NOTE: convolutional output size */
