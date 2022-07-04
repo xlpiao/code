@@ -28,7 +28,7 @@ int main() {
   GLuint vbo;
   /* geometry to use. these are 3 xyz points (9 floats total) to make a
 triangle */
-  GLfloat points[] = {0.0f, 0.5f, 0.0f, 0.5f, -0.5f, 0.0f, -0.5f, -0.5f, 0.0f};
+  GLfloat points[] = {0.0f, 1.0f, 0.0f, 1.0f, -1.0f, 0.0f, -1.0f, -1.0f, 0.0f};
   /* these are the strings of code for the shaders
   the vertex shader positions each vertex point */
   const char* vertex_shader =
@@ -125,9 +125,17 @@ surface onto the view area. we use a double-buffering system which means
 that we have a 'currently displayed' surface, and 'currently being drawn'
 surface. hence the 'swap' idea. in a single-buffering system we would see
 stuff being drawn one-after-the-other */
+  int width = 0;
+  int height = 0;
+  glfwGetFramebufferSize(window, &width, &height);
+  printf("%d %d\n", width, height);
+  glViewport(0, 0, width, height);
   while (!glfwWindowShouldClose(window)) {
     /* wipe the drawing surface clear */
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
     glUseProgram(shader_programme);
     glBindVertexArray(vao);
     /* draw points 0-3 from the currently bound VAO with current in-use
