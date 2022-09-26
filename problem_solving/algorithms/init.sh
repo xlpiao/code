@@ -9,13 +9,15 @@ elif [[ "$1" == "clean" ]]; then
 else
   if [ ! -f "$1" ]; then
     echo "The file \"$1\" does not exist!"
-    echo "Execute: ./init.sh FileName"
+    echo "Execute: ./init.sh FilePath"
   else
+    InputFilePath=$1
+    FileName=$(basename $InputFilePath)
+    FileDir=$(dirname $InputFilePath)
+    OutputFilePath=$FileDir/bin.$FileName
     FLAGS='--std=c++11'
     DEBUG='-Wall -O0 -g'
     CC=clang++
-    rm -rf bin.*
-    $CC -o bin.$1 $1 $FLAGS $DEBUG && ./bin.$1
-    rm -rf bin.*
+    $CC $InputFilePath $FLAGS $DEBUG -o $OutputFilePath && $OutputFilePath
   fi
 fi
