@@ -22,7 +22,8 @@ void initArray(std::vector<int> &arr) {
   int len = arr.size();
 
   for (int i = 0; i < len; i++) {
-    arr[i] = 10 + std::rand() / ((RAND_MAX + 1u) / 6);
+    std::srand(i);
+    arr[i] = std::rand() % 10;
   }
   std::cout << "\ninput data: " << std::endl;
   printArray(arr);
@@ -36,7 +37,7 @@ void selectionSort(std::vector<int> &arr) {
   for (int i = 0; i < len - 1; i++) {
     int minIdx = i;
     for (int j = i + 1; j < len; j++) {
-      if (arr[j] < arr[minIdx]) {
+      if (arr[minIdx] > arr[j]) {
         minIdx = j;
       }
     }

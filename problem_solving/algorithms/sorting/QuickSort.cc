@@ -22,7 +22,8 @@ void initArray(std::vector<int> &arr) {
   int len = arr.size();
 
   for (int i = 0; i < len; i++) {
-    arr[i] = 10 + std::rand() / ((RAND_MAX + 1u) / 6);
+    std::srand(i);
+    arr[i] = std::rand() % 10;
   }
   std::cout << "\ninput data: " << std::endl;
   printArray(arr);
@@ -31,33 +32,33 @@ void initArray(std::vector<int> &arr) {
 //// Time Complexity: O(n*Log(n))
 void quickSort(std::vector<int> &arr, int left, int right) {
   int pivot = arr[(left + right) / 2];
-  int i = left;
-  int j = right;
+  int l = left;
+  int r = right;
 
-  while (i <= j) {
-    while (arr[i] < pivot) {
-      i++;
+  while (l <= r) {
+    while (arr[l] < pivot) {
+      l++;
     }
-    while (arr[j] > pivot) {
-      j--;
+    while (arr[r] > pivot) {
+      r--;
     }
-    if (i < j) {
-      int temp = arr[i];
-      arr[i] = arr[j];
-      arr[j] = temp;
+    if (l < r) {
+      int temp = arr[l];
+      arr[l] = arr[r];
+      arr[r] = temp;
     }
-    if (i <= j) {
-      i++;
-      j--;
+    if (l <= r) {
+      l++;
+      r--;
     }
   }
   printArray(arr);
 
-  if (left < j) {
-    quickSort(arr, left, j);
+  if (left < r) {
+    quickSort(arr, left, r);
   }
-  if (i < right) {
-    quickSort(arr, i, right);
+  if (l < right) {
+    quickSort(arr, l, right);
   }
 }
 
