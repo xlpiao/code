@@ -32,6 +32,7 @@ void initArray(std::vector<int> &arr) {
 //// Time Complexity: O(n*Log(n))
 void quickSort(std::vector<int> &arr, int left, int right) {
   int pivot = arr[(left + right) / 2];
+  std::cout << pivot << std::endl;
   int l = left;
   int r = right;
 
@@ -52,6 +53,7 @@ void quickSort(std::vector<int> &arr, int left, int right) {
       r--;
     }
   }
+  printf("left(%d), r(%d), l(%d), right(%d)\n", left, r, l, right);
   printArray(arr);
 
   if (left < r) {

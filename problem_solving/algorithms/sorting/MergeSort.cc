@@ -42,28 +42,28 @@ void merge(std::vector<int> &arr, int left, int mid, int right) {
     rightArr[i] = arr[i + mid + 1];
   }
 
-  int i = 0;
-  int j = 0;
-  int k = left;
-  while (i < leftSize && j < rightSize) {
-    if (leftArr[i] < rightArr[j]) {
-      arr[k] = leftArr[i];
-      i++;
+  int l = 0;
+  int r = 0;
+  int idx = left;
+  while (l < leftSize && r < rightSize) {
+    if (leftArr[l] < rightArr[r]) {
+      arr[idx] = leftArr[l];
+      l++;
     } else {
-      arr[k] = rightArr[j];
-      j++;
+      arr[idx] = rightArr[r];
+      r++;
     }
-    k++;
+    idx++;
   }
-  while (i < leftSize) {
-    arr[k] = leftArr[i];
-    i++;
-    k++;
+  while (l < leftSize) {
+    arr[idx] = leftArr[l];
+    l++;
+    idx++;
   }
-  while (j < rightSize) {
-    arr[k] = rightArr[j];
-    j++;
-    k++;
+  while (r < rightSize) {
+    arr[idx] = rightArr[r];
+    r++;
+    idx++;
   }
 }
 
