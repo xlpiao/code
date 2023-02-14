@@ -11,7 +11,7 @@ else
     echo "The file \"$1\" does not exist!"
     echo "Execute: ./init.sh FileName"
   else
-    FLAGS='--std=c++11'
+    FLAGS='--std=c++17'
     DEBUG='-Wall -O0 -g'
     CC=clang++
     rm -rf bin.*
