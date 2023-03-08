@@ -1,5 +1,7 @@
 #!/bin/bash
 
+SCRIPT_DIR=$(realpath $(dirname $0))
+
 if [[ "$1" == "docker" ]]; then
   docker run --gpus all --privileged --rm -it -v $PWD:/workspace pytorch/pytorch:1.8.0-cuda11.1-cudnn8-devel
 elif [[ "$1" == "build" ]]; then
