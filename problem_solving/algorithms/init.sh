@@ -1,7 +1,10 @@
 #!/bin/bash
 
+SCRIPT_DIR=$(realpath $(dirname $0))
+echo $SCRIPT_DIR
+
 if [[ "$1" == "docker" ]]; then
-  docker run --gpus all --privileged --rm -it -v $PWD:/workspace pytorch/pytorch:1.8.0-cuda11.1-cudnn8-devel
+  docker run --gpus all --privileged --rm -it -v $SCRIPT_DIR:/work pytorch/pytorch:1.8.0-cuda11.1-cudnn8-devel
 elif [[ "$1" == "build" ]]; then
   $CC -o bin.$1 $1 $FLAGS $DEBUG
 elif [[ "$1" == "clean" ]]; then
@@ -9,15 +12,13 @@ elif [[ "$1" == "clean" ]]; then
 else
   if [ ! -f "$1" ]; then
     echo "The file \"$1\" does not exist!"
-    echo "Execute: ./init.sh FilePath"
+    echo "Execute: ./init.sh FileName"
   else
-    InputFilePath=$1
-    FileName=$(basename $InputFilePath)
-    FileDir=$(dirname $InputFilePath)
-    OutputFilePath=$FileDir/bin.$FileName
-    FLAGS='--std=c++11'
+    FLAGS='--std=c++17'
     DEBUG='-Wall -O0 -g'
     CC=clang++
-    $CC $InputFilePath $FLAGS $DEBUG -o $OutputFilePath && $OutputFilePath
+    rm -rf bin.*
+    $CC -o bin.$1 $1 $FLAGS $DEBUG && ./bin.$1
+    rm -rf bin.*
   fi
 fi
