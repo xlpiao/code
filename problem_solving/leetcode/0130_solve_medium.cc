@@ -47,7 +47,7 @@ private:
       // cout << r << ", " << c << endl;
       return;
     }
-    cout << r << ", " << c << endl;
+    // cout << r << ", " << c << endl;
     board[r][c] = 'E';
 
     dfs(board, r - 1, c, m, n);
