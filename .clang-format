@@ -1,7 +1,7 @@
 ---
 Language:        Cpp
 # BasedOnStyle:  Google
-AccessModifierOffset: -2
+AccessModifierOffset: -1
 AlignAfterOpenBracket: Align
 AlignArrayOfStructures: None
 AlignConsecutiveMacros: None
@@ -26,8 +26,8 @@ AlwaysBreakBeforeMultilineStrings: true
 AlwaysBreakTemplateDeclarations: Yes
 AttributeMacros:
   - __capability
-BinPackArguments: false
-BinPackParameters: false
+BinPackArguments: true
+BinPackParameters: true
 BraceWrapping:
   AfterCaseLabel:  false
   AfterClass:      false
@@ -207,7 +207,7 @@ SpacesInParentheses: false
 SpacesInSquareBrackets: false
 SpaceBeforeSquareBrackets: false
 BitFieldColonSpacing: Both
-
+Standard:        Auto
 StatementAttributeLikeMacros:
   - Q_EMIT
 StatementMacros:
