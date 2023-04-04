@@ -21,13 +21,20 @@ fi
 # else
   # STYLEARG="-style=google"
 # fi
-STYLEARG="-style={BasedOnStyle: google, AccessModifierOffset: -2, BinPackArguments: false, BinPackParameters: false}"
+STYLEARG="-style={ \
+          BasedOnStyle: google, \
+          AccessModifierOffset: -2, \
+          BinPackArguments: false, \
+          BinPackParameters: false, \
+          AllowAllParametersOfDeclarationOnNextLine: true \
+          }"
 
 format_file() {
   file="${1}"
   if [ -f $file ]; then
-    clang-format -i ${STYLEARG} ${1}
-    git add ${1}
+    # clang-format -i ${STYLEARG} ${file}
+    clang-format -style=google ${file}
+    git add ${file}
   fi
 }
 
