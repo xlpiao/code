@@ -1,9 +1,10 @@
 #include <iostream>
 #include <vector>
+
 using namespace std;
 
 class Solution {
-public:
+ public:
   void print(vector<vector<char>>& board) {
     for (auto it : board) {
       for (auto elem : it) {
@@ -41,7 +42,7 @@ public:
     }
   }
 
-private:
+ private:
   void dfs(vector<vector<char>>& board, int r, int c, int m, int n) {
     if (r < 0 || r >= m || c < 0 || c >= n || board[r][c] != 'O') {
       // cout << r << ", " << c << endl;
