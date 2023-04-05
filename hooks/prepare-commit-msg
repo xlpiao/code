@@ -4,11 +4,11 @@ COMMIT_MSG_FILE=$(cat "$1")
 
 if [ -n "$COMMIT_MSG_FILE" ]; then
   echo "# Commit message format:" >> $1
-  echo "#\t[feat]: add new feature" >> $1
-  echo "#\t[bugfix]: fix bugs" >> $1
-  echo "#\t[docs]: change the documentation" >> $1
-  echo "#\t[style]: format source code" >> $1
-  echo "#\t[refactor]: refactor production code" >> $1
-  echo "#\t[test]: add missing tests" >> $1
-  echo "#\t[chore]: update build system and setup files" >> $1
+  echo "#\t[feat] add new feature" >> $1
+  echo "#\t[bugfix] fix bugs" >> $1
+  echo "#\t[docs] change the documentation" >> $1
+  echo "#\t[style] format source code" >> $1
+  echo "#\t[refactor] refactor production code" >> $1
+  echo "#\t[test] add missing tests" >> $1
+  echo "#\t[chore] update build system and setup files" >> $1
 fi
