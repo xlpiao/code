@@ -1,5 +1,14 @@
 #!/bin/sh
 
+if [ "$(uname)" = "Linux" ]; then
+  sed -i '1 i\
+    [feat]'$'\n' $1
+elif [ "$(uname)" = "Darwin" ]; then
+  sed -i '' '1 i\
+    [feat]'$'\n' $1
+else
+fi
+
 COMMIT_MSG_FILE=$(cat "$1")
 
 if [ -n "$COMMIT_MSG_FILE" ]; then
