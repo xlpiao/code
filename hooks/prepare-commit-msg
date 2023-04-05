@@ -1,18 +1,22 @@
 #!/bin/sh
 
-if [ "$(uname)" = "Linux" ]; then
-  sed -i '1 i\
+REGEX="\[feat\].+|\[bugfix\].+|\[docs\].+|\[style\].+|\[refactor\].+|\[test\].+|\[chore\].+"
+COMMIT_MSG_KEYWORD=$(head -1 $1 | sed 's/ *$//g' | grep -Ee $REGEX)
+if [ -z "$COMMIT_MSG_KEYWORD" ]; then
+  if [ "$(uname)" = "Linux" ]; then
+    sed -i '1 i\
 [feat]'$'\n' $1
-elif [ "$(uname)" = "Darwin" ]; then
-  sed -i '' '1 i\
+  elif [ "$(uname)" = "Darwin" ]; then
+    sed -i '' '1 i\
 [feat]'$'\n' $1
-else
-  sed -i '1 i\
+  else
+    sed -i '1 i\
 [feat]'$'\n' $1
+  fi
 fi
 
-COMMIT_MSG_FILE=$(cat "$1")
 
+COMMIT_MSG_FILE=$(cat "$1")
 if [ -n "$COMMIT_MSG_FILE" ]; then
   echo "# Commit message format:" >> $1
   echo "#\t[feat] add new feature" >> $1
