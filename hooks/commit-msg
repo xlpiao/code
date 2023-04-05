@@ -6,8 +6,9 @@ CYAN="\033[0;36m"
 RESET="\033[0m"
 
 REGEX="\[feat\].+|\[bugfix\].+|\[docs\].+|\[style\].+|\[refactor\].+|\[test\].+|\[chore\].+"
-COMMIT_MSG=$(cat $1 | sed 's/ *$//g' | grep -Ee $REGEX)
+COMMIT_MSG=$(head -1 $1 | sed 's/ *$//g' | grep -Ee $REGEX)
 
+# zero length and null
 if [ -z "$COMMIT_MSG" ]; then
   echo "${RED}\nPOLICY!!! Wrong commit message format!!!\nPlease format your commit message as followings:${RESET}"
   echo "${CYAN}\n[feat] edit your commit msg here...\n...\n${RESET}"
@@ -17,7 +18,8 @@ if [ -z "$COMMIT_MSG" ]; then
   echo "${GREEN}[docs]${RESET} change the documentation"
   echo "${GREEN}[style]${RESET} format source code"
   echo "${GREEN}[refactor]${RESET} refactor production code"
-  echo "${GREEN}[test]${RESET} add missing tests\n"
+  echo "${GREEN}[test]${RESET} add missing tests"
+  echo "${GREEN}[chore]${RESET} update build system and setup files\n"
   exit 1
 else
   echo "$(cat $1)"
