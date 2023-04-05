@@ -2,11 +2,13 @@
 
 if [ "$(uname)" = "Linux" ]; then
   sed -i '1 i\
-    [feat]'$'\n' $1
+[feat]'$'\n' $1
 elif [ "$(uname)" = "Darwin" ]; then
   sed -i '' '1 i\
-    [feat]'$'\n' $1
+[feat]'$'\n' $1
 else
+  sed -i '1 i\
+[feat]'$'\n' $1
 fi
 
 COMMIT_MSG_FILE=$(cat "$1")
