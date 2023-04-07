@@ -4,20 +4,17 @@
 using namespace std;
 
 class Solution {
-public:
-  void backtrack(int start,
-                 int n,
-                 vector<int>& nums,
-                 vector<int>& subset,
+ public:
+  void backtrack(vector<int>& nums, int start, int end, vector<int>& subset,
                  vector<vector<int>>& ans) {
     ans.push_back(subset);
 
-    for (int i = start; i < n; i++) {
+    for (int i = start; i < end; i++) {
       if (i > start && nums[i] == nums[i - 1]) {
         continue;
       }
       subset.push_back(nums[i]);
-      backtrack(i + 1, n, nums, subset, ans);
+      backtrack(nums, i + 1, end, subset, ans);
       subset.pop_back();
     }
   }
@@ -27,7 +24,7 @@ public:
 
     vector<vector<int>> ans;
     vector<int> subset;
-    backtrack(0, nums.size(), nums, subset, ans);
+    backtrack(nums, 0, nums.size(), subset, ans);
     // sort(ans.begin(), ans.end());
     // ans.erase(unique(ans.begin(), ans.end()), ans.end());
 
@@ -37,7 +34,7 @@ public:
 
 int main(void) {
   Solution s;
-  vector<int> nums = {3, 4, 5};
+  vector<int> nums = {3, 5, 5};
 
   cout << "input: ";
   for (auto it : nums) {
@@ -45,7 +42,7 @@ int main(void) {
   }
   cout << endl;
 
-  auto ans = s.subsets(nums);
+  auto ans = s.subsetsWithDup(nums);
 
   cout << "output: ";
   for (auto it : ans) {

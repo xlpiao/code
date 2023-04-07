@@ -4,17 +4,14 @@
 using namespace std;
 
 class Solution {
-public:
-  void backtrack(int start,
-                 int n,
-                 vector<int>& nums,
-                 vector<int>& subset,
+ public:
+  void backtrack(vector<int>& nums, int start, int end, vector<int>& subset,
                  vector<vector<int>>& ans) {
     ans.push_back(subset);
 
-    for (int i = start; i < n; i++) {
+    for (int i = start; i < end; i++) {
       subset.push_back(nums[i]);
-      backtrack(i + 1, n, nums, subset, ans);
+      backtrack(nums, i + 1, end, subset, ans);
       subset.pop_back();
     }
   }
@@ -22,7 +19,7 @@ public:
   vector<vector<int>> subsets(vector<int>& nums) {
     vector<vector<int>> ans;
     vector<int> subset;
-    backtrack(0, nums.size(), nums, subset, ans);
+    backtrack(nums, 0, nums.size(), subset, ans);
 
     return ans;
   }
