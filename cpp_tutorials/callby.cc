@@ -20,16 +20,15 @@ void swapByAddress(int* x, int* y)  // Call by pointer or Call by address
 }
 
 int main(void) {
-  int x1 = 0, y1 = 1;
-
+  int x1 = 1, y1 = 2;
   swapByValue(x1, y1);
   std::cout << "x1 = " << x1 << ", y1 = " << y1 << std::endl;
 
-  int x2 = 2, y2 = 3;
+  int x2 = 1, y2 = 2;
   swapByReference(x2, y2);
   std::cout << "x2 = " << x2 << ", y2 = " << y2 << std::endl;
 
-  int x3 = 4, y3 = 5;
+  int x3 = 1, y3 = 2;
   swapByAddress(&x3, &y3);
   std::cout << "x3 = " << x3 << ", y3 = " << y3 << std::endl;
 

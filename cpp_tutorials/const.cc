@@ -27,8 +27,8 @@ int main(void) {
   int* const ptr3 = &val3;
   std::cout << *ptr3 << std::endl;
 
-  int val4 = 40;
-  // ptr3 = &val4; // error: cannot assign to variable 'ptr3' with
+  // int val4 = 40;
+  // ptr3 = &val4;  // error: cannot assign to variable 'ptr3' with
   // const-qualified type 'int *const' std::cout << *ptr3 << std::endl;
   *ptr3 = 33;
   std::cout << *ptr3 << std::endl;
