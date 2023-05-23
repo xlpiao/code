@@ -3,6 +3,8 @@ using namespace std;
 
 // forward declaration
 class B;
+class A;
+
 class A {
  private:
   int numA;
@@ -30,6 +32,6 @@ int add(A objectA, B objectB) { return (objectA.numA + objectB.numB); }
 int main() {
   A objectA;
   B objectB;
-  cout << "Sum: " << add(objectA, objectB);
+  cout << "Sum: " << add(objectA, objectB) << endl;
   return 0;
 }

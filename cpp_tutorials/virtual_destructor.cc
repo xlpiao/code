@@ -1,66 +1,71 @@
 #include <iostream>
 
+#define LOG() printf("%s +%d\t%s\n", __FILE__, __LINE__, __PRETTY_FUNCTION__)
+
 // #define VIRTUAL
 
 class First {
  public:
 #ifdef VIRTUAL
-  First() { std::cout << "First Constructor" << std::endl; }
-  virtual ~First() { std::cout << "First Destructor" << std::endl; }
+  First() { LOG(); }
+  virtual ~First() { LOG(); }
   virtual void MyFunc()
 #else
-  First() { std::cout << "First Constructor" << std::endl; }
-  ~First() { std::cout << "First Destructor" << std::endl; }
+  First() { LOG(); }
+  ~First() { LOG(); }
   void MyFunc()
 #endif
   {
-    std::cout << "FirstFunc" << std::endl;
+    LOG();
   }
 };
 
 class Second : public First {
  public:
 #ifdef VIRTUAL
-  Second() { std::cout << "Second Constructor" << std::endl; }
-  virtual ~Second() { std::cout << "Second Destructor" << std::endl; }
-  // 오버라이딩 된 함수가 virtual이면 오버라이딩 한 함수도 자동으로 virtual
+  Second() { LOG(); }
+  virtual ~Second() { LOG(); }
   virtual void MyFunc()
 #else
-  Second() { std::cout << "Second Constructor" << std::endl; }
-  ~Second() { std::cout << "Second Destructor" << std::endl; }
+  Second() { LOG(); }
+  ~Second() { LOG(); }
   void MyFunc()
 #endif
   {
-    std::cout << "SecondFunc" << std::endl;
+    LOG();
   }
 };
 
 class Third : public Second {
  public:
 #ifdef VIRTUAL
-  Third() { std::cout << "Third Constructor" << std::endl; }
-  virtual ~Third() { std::cout << "Third Destructor" << std::endl; }
+  Third() { LOG(); }
+  virtual ~Third() { LOG(); }
   virtual void MyFunc()
 #else
-  Third() { std::cout << "Third Constructor" << std::endl; }
-  ~Third() { std::cout << "Third Destructor" << std::endl; }
+  Third() { LOG(); }
+  ~Third() { LOG(); }
   void MyFunc()
 #endif
   {
-    std::cout << "ThirdFunc" << std::endl;
+    LOG();
   }
 };
 
 int main(void) {
-  Third* tptr = new Third();
-  Second* sptr = tptr;
-  First* fptr = sptr;
+  std::cout << "3" << std::endl;
+  Third* third = new Third();
+  third->MyFunc();
 
-  tptr->MyFunc();
-  sptr->MyFunc();
-  fptr->MyFunc();
+  std::cout << "2" << std::endl;
+  Second* second = third;
+  second->MyFunc();
 
-  delete tptr;
+  std::cout << "1" << std::endl;
+  First* first = second;
+  first->MyFunc();
+
+  delete third;
 
   return 0;
 }

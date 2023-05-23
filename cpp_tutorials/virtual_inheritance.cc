@@ -1,33 +1,38 @@
 #include <iostream>
 
+#define LOG() printf("%s +%d\t%s\n", __FILE__, __LINE__, __PRETTY_FUNCTION__)
+
 class Base {
  public:
-  Base() { std::cout << "Base" << std::endl; };
-  virtual void func() { std::cout << "Base::func" << std::endl; };
+  Base() { LOG(); };
+  ~Base() { LOG(); };
+  virtual void func() { LOG(); };
 };
 
-class DerivedA : virtual public Base {
+class Derived1 : virtual public Base {
  public:
-  DerivedA() { std::cout << "DerivedA" << std::endl; };
-  void func() { std::cout << "DerivedA::func" << std::endl; };
+  Derived1() { LOG(); };
+  ~Derived1() { LOG(); };
+  void func() { LOG(); };
 };
 
-// class DerivedB : virtual public Base, public DerivedA {
-class DerivedB : virtual public Base, virtual public DerivedA {
+// class Derived2 : virtual public Base, public Derived1 {
+class Derived2 : virtual public Base, virtual public Derived1 {
  public:
-  DerivedB() { std::cout << "DerivedB" << std::endl; };
-  void func() { std::cout << "DerivedB::func" << std::endl; };
+  Derived2() { LOG(); };
+  ~Derived2() { LOG(); };
+  void func() { LOG(); };
 };
 
 int main(int argc, char *argv[]) {
-  Base *b1;
-  Base *b2;
-  DerivedA *d1 = new DerivedA();
-  DerivedB *d2 = new DerivedB();
+  Derived1 d1;
+  Derived2 d2;
 
-  b1 = d1;
-  b2 = d2;
+  std::cout << "1" << std::endl;
+  Base &b1 = d1;
+  b1.func();
 
-  b1->func();
-  b2->func();
+  std::cout << "2" << std::endl;
+  Base &b2 = d2;
+  b2.func();
 }

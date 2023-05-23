@@ -1,28 +1,45 @@
 #include <iostream>
 
-class AAA {
- private:
-  int num1;
+#define LOG() printf("%s +%d\t%s\n", __FILE__, __LINE__, __PRETTY_FUNCTION__)
+using namespace std;
 
+class AAA {
  public:
-  virtual void Func1() { std::cout << "AAA::Func1" << std::endl; }
-  virtual void Func2() { std::cout << "AAA::Func2" << std::endl; }
+  AAA() { LOG(); }
+  ~AAA() { LOG(); }
+  virtual void Func1() { LOG(); }
+  void Func2() { LOG(); }
 };
 
 class BBB : public AAA {
- private:
-  int num2;
-
  public:
-  virtual void Func1() { std::cout << "BBB::Func1" << std::endl; }
-  void Func3() { std::cout << "BBB::Func3" << std::endl; }
+  BBB() { LOG(); }
+  ~BBB() { LOG(); }
+  virtual void Func1() { LOG(); }
+  void Func2() { LOG(); }
+  void Func3() { LOG(); }
 };
 
 int main(void) {
-  AAA* aptr = new AAA();
-  aptr->Func1();
+  cout << "1" << endl;
+  AAA a;
+  a.Func1();
+  a.Func2();
 
-  BBB* bptr = new BBB();
-  bptr->Func1();
+  cout << "2" << endl;
+  BBB b;
+  b.Func1();
+  b.Func2();
+
+  cout << "3" << endl;
+  AAA* obj = &b;
+  obj->Func1();
+  obj->Func2();
+
+  cout << "4" << endl;
+  AAA& ref = b;
+  ref.Func1();
+  ref.Func2();
+
   return 0;
 }

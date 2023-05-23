@@ -1,7 +1,10 @@
 #include <iostream>
+
+#define LOG() printf("%s +%d\t%s\n", __FILE__, __LINE__, __PRETTY_FUNCTION__)
+
 using namespace std;
 
-#define VIRTUAL
+// #define VIRTUAL
 
 class First {
  public:
@@ -11,7 +14,7 @@ class First {
   void MyFunc()
 #endif
   {
-    cout << "FirstFunc" << endl;
+    LOG();
   }
 };
 
@@ -24,7 +27,7 @@ class Second : public First {
   void MyFunc()
 #endif
   {
-    cout << "SecondFunc" << endl;
+    LOG();
   }
 };
 
@@ -36,20 +39,20 @@ class Third : public Second {
   void MyFunc()
 #endif
   {
-    cout << "ThirdFunc" << endl;
+    LOG();
   }
 };
 
 int main(void) {
-  Third* tptr = new Third();
-  Second* sptr = tptr;
-  First* fptr = sptr;
+  Third* third = new Third();
+  Second* second = third;
+  First* first = second;
 
-  tptr->MyFunc();
-  sptr->MyFunc();
-  fptr->MyFunc();
+  third->MyFunc();
+  second->MyFunc();
+  first->MyFunc();
 
-  delete tptr;
+  delete third;
 
   return 0;
 }

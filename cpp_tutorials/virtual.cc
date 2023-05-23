@@ -1,48 +1,46 @@
 #include <iostream>
 using namespace std;
 
+#define LOG() printf("%s +%d\t%s\n", __FILE__, __LINE__, __PRETTY_FUNCTION__)
+
 class First {
  public:
-  void FirstFunc() { cout << "FirstFunc()" << endl; }
-  virtual void SimpleFunc() { cout << "First's SimpleFunc()" << endl; }
+  First() { LOG(); }
+  ~First() { LOG(); }
+  void Func() { LOG(); }
+  virtual void SimpleFunc() { LOG(); }
 };
 
 class Second : public First {
  public:
-  void SecondFunc() { cout << "SecondFunc()" << endl; }
-  virtual void SimpleFunc() { cout << "Second's SimpleFunc()" << endl; }
+  Second() { LOG(); }
+  ~Second() { LOG(); }
+  void Func() { LOG(); }
+  virtual void SimpleFunc() { LOG(); }
 };
 
 class Third : public Second {
  public:
-  void ThirdFunc() { cout << "ThirdFunc()" << endl; }
-  virtual void SimpleFunc() { cout << "Third's SimpleFunc()" << endl; }
+  Third() { LOG(); }
+  ~Third() { LOG(); }
+  void Func() { LOG(); }
+  void SimpleFunc() override { LOG(); }
 };
 
 int main(void) {
+  cout << "1" << endl;
   Third obj;
-  obj.FirstFunc();
-  obj.SecondFunc();
-  obj.ThirdFunc();
+  obj.Func();
   obj.SimpleFunc();
 
-  Second& sref = obj;  // obj는 Second를 상속하는 Third 객체이므로, Second형
-                       // 참조자로 참조 가능
-  sref.FirstFunc();
-  sref.SecondFunc();
-  // 컴파일러는 참조자의 자료형을 가지고 함수의 호출 가능성을 판단
-  // First 클래스에 정의된 FirstFunc 함수와 Second 클래스에 정의된 SecondFunc
-  // 함수는 호출 가능
+  cout << "2" << endl;
+  Second& s = obj;
+  s.Func();
+  s.SimpleFunc();
 
-  sref.SimpleFunc();
-  // SimpeFunc 함수는 가상함수 -> Third 클래스에 정의된 SimpleFunc 함수가 호출
-
-  First& fref = obj;
-  // obj는 First를 간접 상속하는 Third 객체이므로, First형 참조자로 참조 가능
-
-  fref.FirstFunc();
-  fref.SimpleFunc();
-  // First 클래스에 정의된 함수만 호출 가능. SimpleFunc는 가상함수 -> Third
-  // 클래스에 정의된 SimpleFunc 함수 호출
+  cout << "3" << endl;
+  First& f = obj;
+  f.Func();
+  f.SimpleFunc();
   return 0;
 }

@@ -1,5 +1,7 @@
 #include <cstring>
 #include <iostream>
+#include <string>
+
 using namespace std;
 
 template <typename T>
@@ -48,8 +50,8 @@ class SimpleDataWrapper<char*>  // 클래스 템플릿 SimpleDataWrapper를 char
 };
 
 template <>
-class SimpleDataWrapper<Point<int> >  // Point<int>형에 대해서 특수화 : 자료형의
-                                      // 이름을 Point<int>가 대신
+class SimpleDataWrapper<Point<int>>  // Point<int>형에 대해서 특수화 : 자료형의
+                                     // 이름을 Point<int>가 대신
 {
  private:
   Point<int> mdata;
@@ -66,12 +68,12 @@ int main(void) {
   // 클래스를 기반으로 객체 생성
   iwrap.ShowDataInfo();
 
-  SimpleDataWrapper<char*> swrap("Class Template Specialization");
+  SimpleDataWrapper<string> swrap("Class Template Specialization");
   // char* 형에 대해서 특수화 진행 -> 별도의 클래스 생성되지 않고, 위에 정의된
   // 템플릿 클래스의 객체 생성
   swrap.ShowDataInfo();
 
-  SimpleDataWrapper<Point<int> > poswrap(3, 7);
+  SimpleDataWrapper<Point<int>> poswrap(3, 7);
   // Point<int> 형에 대해서 특수화 진행
   poswrap.ShowDataInfo();
   return 0;

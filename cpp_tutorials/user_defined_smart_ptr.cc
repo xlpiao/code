@@ -6,10 +6,8 @@ class Point {
   int xpos, ypos;
 
  public:
-  Point(int x = 0, int y = 0) : xpos(x), ypos(y) {
-    cout << "Point Constructor" << endl;
-  }
-  ~Point() { cout << "Point Destructor" << endl; }
+  Point(int x = 0, int y = 0) : xpos(x), ypos(y) { cout << __func__ << endl; }
+  ~Point() { cout << __func__ << endl; }
   void SetPos(int x, int y) {
     xpos = x;
     ypos = y;
@@ -17,7 +15,7 @@ class Point {
   friend ostream& operator<<(ostream& output_stream, const Point& pos);
 };
 ostream& operator<<(ostream& output_stream, const Point& pos) {
-  cout << "Call operator<<:  ";
+  cout << __func__;
   output_stream << '[' << pos.xpos << ", " << pos.ypos << ']' << endl;
   return output_stream;
 }
@@ -27,9 +25,7 @@ class SmartPtr {
   Point* pos_ptr_;
 
  public:
-  SmartPtr(Point* pos_ptr) : pos_ptr_(pos_ptr) {
-    cout << "SmartPtr Constructor" << endl;
-  }
+  SmartPtr(Point* pos_ptr) : pos_ptr_(pos_ptr) { cout << __func__ << endl; }
 
   Point& operator*() const  //스마트 포인터는 포인터처럼 동작하는 객체
   {
@@ -40,7 +36,7 @@ class SmartPtr {
     return pos_ptr_;
   }
   ~SmartPtr() {
-    cout << "SmartPtr Destructor" << endl;
+    cout << __func__ << endl;
     delete pos_ptr_;
   }
 };
@@ -55,12 +51,12 @@ int main(void) {
   cout << *sptr2;
   cout << *sptr3;
 
-  sptr1->SetPos(10, 20);  // 포인터처럼 -> 연산 진행
-  sptr2->SetPos(30, 40);
-  sptr3->SetPos(50, 60);
-  cout << *sptr1;
-  cout << *sptr2;
-  cout << *sptr3;
+  // sptr1->SetPos(10, 20);  // 포인터처럼 -> 연산 진행
+  // sptr2->SetPos(30, 40);
+  // sptr3->SetPos(50, 60);
+  // cout << *sptr1;
+  // cout << *sptr2;
+  // cout << *sptr3;
 
   return 0;
 }

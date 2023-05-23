@@ -2,16 +2,22 @@
 
 class BaseOne {
  public:
-  void SimpleFunc() { std::cout << "BaseOne" << std::endl; }
+  BaseOne() { std::cout << __PRETTY_FUNCTION__ << std::endl; }
+  ~BaseOne() { std::cout << __PRETTY_FUNCTION__ << std::endl; }
+  void SimpleFunc() { std::cout << __PRETTY_FUNCTION__ << std::endl; }
 };
 
 class BaseTwo {
  public:
-  void SimpleFunc() { std::cout << "BaseTwo" << std::endl; }
+  BaseTwo() { std::cout << __PRETTY_FUNCTION__ << std::endl; }
+  ~BaseTwo() { std::cout << __PRETTY_FUNCTION__ << std::endl; }
+  void SimpleFunc() { std::cout << __PRETTY_FUNCTION__ << std::endl; }
 };
 
 class MultiDrived : public BaseOne, public BaseTwo {
  public:
+  MultiDrived() { std::cout << __PRETTY_FUNCTION__ << std::endl; }
+  ~MultiDrived() { std::cout << __PRETTY_FUNCTION__ << std::endl; }
   void SimpleFunc() {
     std::cout << "MultiDrived" << std::endl;
     BaseOne::SimpleFunc();
@@ -20,7 +26,8 @@ class MultiDrived : public BaseOne, public BaseTwo {
 };
 
 int main(void) {
-  MultiDrived mdr;
-  mdr.SimpleFunc();
+  MultiDrived *obj = new MultiDrived();
+  obj->SimpleFunc();
+  delete obj;
   return 0;
 }

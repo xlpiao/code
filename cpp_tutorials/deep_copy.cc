@@ -16,8 +16,8 @@ class DataCopy {
 
   // Sample 08: Introduce Copy Constructor and perform Deep Copy
   // Add 'explicit' to avoid assign operation
-  // explicit DataCopy(const DataCopy& obj) {
-  DataCopy(const DataCopy& obj) {
+  explicit DataCopy(const DataCopy& obj) {
+    // DataCopy(const DataCopy& obj) {
     std::cout << "DataCopy(const DataCopy& obj)" << std::endl;
     x = new int;
     *x = obj.GetX();
