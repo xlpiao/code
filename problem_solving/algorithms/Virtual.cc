@@ -1,20 +1,23 @@
 #include <iostream>
+
+#define LOG() printf("%s +%d\t%s\n", __FILE__, __LINE__, __PRETTY_FUNCTION__)
+
 using namespace std;
 
 class Base {
  public:
-  Base() { cout << "Base Constructor" << endl; }
-  ~Base() { cout << "Base Destructor" << endl; }
-  virtual void print1() { cout << "Base print1" << endl; }
-  void print2() { cout << "Base print2" << endl; }
+  Base() { LOG(); }
+  ~Base() { LOG(); }
+  virtual void print1() { LOG(); }
+  void print2() { LOG(); }
 };
 
 class Derived : public Base {
  public:
-  Derived() { cout << "Derived Constructor" << endl; }
-  ~Derived() { cout << "Derived Destructor" << endl; }
-  void print1() { cout << "Derived print1" << endl; }
-  void print2() { cout << "Derived print2" << endl; }
+  Derived() { LOG(); }
+  ~Derived() { LOG(); }
+  void print1() { LOG(); }
+  void print2() { LOG(); }
 };
 
 int main() {
