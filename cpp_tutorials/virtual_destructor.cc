@@ -2,54 +2,45 @@
 
 #define LOG() printf("%s +%d\t%s\n", __FILE__, __LINE__, __PRETTY_FUNCTION__)
 
-// #define VIRTUAL
+#define VIRTUAL
 
 class First {
  public:
 #ifdef VIRTUAL
   First() { LOG(); }
   virtual ~First() { LOG(); }
-  virtual void MyFunc()
+  virtual void MyFunc() { LOG(); }
 #else
   First() { LOG(); }
   ~First() { LOG(); }
-  void MyFunc()
+  void MyFunc() { LOG(); }
 #endif
-  {
-    LOG();
-  }
 };
 
 class Second : public First {
  public:
 #ifdef VIRTUAL
   Second() { LOG(); }
-  virtual ~Second() { LOG(); }
-  virtual void MyFunc()
+  ~Second() { LOG(); }
+  void MyFunc() override { LOG(); }
 #else
   Second() { LOG(); }
   ~Second() { LOG(); }
-  void MyFunc()
+  void MyFunc() { LOG(); }
 #endif
-  {
-    LOG();
-  }
 };
 
 class Third : public Second {
  public:
 #ifdef VIRTUAL
   Third() { LOG(); }
-  virtual ~Third() { LOG(); }
-  virtual void MyFunc()
+  ~Third() { LOG(); }
+  void MyFunc() override { LOG(); }
 #else
   Third() { LOG(); }
   ~Third() { LOG(); }
-  void MyFunc()
+  void MyFunc() { LOG(); }
 #endif
-  {
-    LOG();
-  }
 };
 
 int main(void) {

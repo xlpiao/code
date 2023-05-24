@@ -15,7 +15,7 @@ class BBB : public AAA {
  public:
   BBB() { LOG(); }
   ~BBB() { LOG(); }
-  virtual void Func1() { LOG(); }
+  void Func1() override { LOG(); }
   void Func2() { LOG(); }
   void Func3() { LOG(); }
 };

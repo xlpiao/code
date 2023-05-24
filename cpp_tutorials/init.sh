@@ -37,6 +37,7 @@ else
     echo "The file \"${1}\" does not exist!"
     echo "Execute: ./init.sh FileName"
   else
+    rm -rf bin.*
     $CC -o bin.${1} ${1} ${FLAGS} ${DEBUG}; check "Compile"
     ./bin.${1}; check "Run"; rm -rf bin.*
   fi

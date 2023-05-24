@@ -24,7 +24,7 @@ class Third : public Second {
   Third() { LOG(); }
   ~Third() { LOG(); }
   void Func() { LOG(); }
-  void SimpleFunc() override { LOG(); }
+  void SimpleFunc() { LOG(); }
 };
 
 int main(void) {
