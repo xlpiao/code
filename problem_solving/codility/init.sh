@@ -15,9 +15,9 @@ RESET="\033[0m"
 function check() {
   ERROR=${?}
   if [[ ${ERROR} == 0 ]]; then
-    printf "${GREENBOLD}%s Success !!!${RESET}\n\n" "${1}"
+    printf "\n${GREENBOLD}%s Success !!!${RESET}\n\n" "${1}"
   else
-    printf "${REDBOLD}%s Failed With Error Code ${ERROR} !!!${RESET}\n\n" "${1}"
+    printf "\n${REDBOLD}%s Failed With Error Code ${ERROR} !!!${RESET}\n\n" "${1}"
     exit ${ERROR}
   fi
 }
