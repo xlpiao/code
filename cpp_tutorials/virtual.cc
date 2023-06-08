@@ -3,44 +3,58 @@ using namespace std;
 
 #define LOG() printf("%s +%d\t%s\n", __FILE__, __LINE__, __PRETTY_FUNCTION__)
 
-class First {
+class Parent {
  public:
-  First() { LOG(); }
-  ~First() { LOG(); }
+  Parent() { LOG(); }
+  virtual ~Parent() { LOG(); }
   void Func() { LOG(); }
   virtual void SimpleFunc() { LOG(); }
 };
 
-class Second : public First {
+class Child1 : public Parent {
  public:
-  Second() { LOG(); }
-  ~Second() { LOG(); }
+  Child1() { LOG(); }
+  ~Child1() { LOG(); }
   void Func() { LOG(); }
   virtual void SimpleFunc() { LOG(); }
 };
 
-class Third : public Second {
+class Child2 : public Child1 {
  public:
-  Third() { LOG(); }
-  ~Third() { LOG(); }
+  Child2() { LOG(); }
+  ~Child2() { LOG(); }
   void Func() { LOG(); }
   void SimpleFunc() { LOG(); }
 };
 
 int main(void) {
   cout << "1" << endl;
-  Third obj;
-  obj.Func();
-  obj.SimpleFunc();
+  Child1* c1 = new Child1();
+  c1->Func();
+  c1->SimpleFunc();
+  // delete c1;
 
   cout << "2" << endl;
-  Second& s = obj;
-  s.Func();
-  s.SimpleFunc();
+  Child2* c2 = new Child2();
+  c2->Func();
+  c2->SimpleFunc();
+  // delete c2;
 
   cout << "3" << endl;
-  First& f = obj;
-  f.Func();
-  f.SimpleFunc();
+  Parent* f = c1;
+  f->Func();
+  f->SimpleFunc();
+  delete f;
+
+  cout << "4" << endl;
+  Parent* test = new Child2();
+  test->Func();
+  test->SimpleFunc();
+  delete test;
+
+  cout << "delete" << endl;
+  // delete c1;
+  delete c2;
+
   return 0;
 }

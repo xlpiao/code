@@ -1,4 +1,7 @@
 #include <iostream>
+
+#define LOG() printf("%s +%d\t%s\n", __FILE__, __LINE__, __PRETTY_FUNCTION__)
+
 using namespace std;
 
 class DataCopy {
@@ -8,51 +11,54 @@ class DataCopy {
 
  public:
   // Sample 02: Constructor with single parameter
-  DataCopy(int m) {
-    std::cout << "DataCopy(int m)" << std::endl;
+  DataCopy() {
+    LOG();
     x = new int;
-    *x = m;
   }
 
   // Sample 08: Introduce Copy Constructor and perform Deep Copy
   // Add 'explicit' to avoid assign operation
+  // Copy Constructor
   explicit DataCopy(const DataCopy& obj) {
     // DataCopy(const DataCopy& obj) {
-    std::cout << "DataCopy(const DataCopy& obj)" << std::endl;
+    LOG();
     x = new int;
-    *x = obj.GetX();
+    *x = obj.getX();
   }
 
+  // Copy Assignment Operator
   DataCopy& operator=(const DataCopy& obj) {
-    std::cout << "DataCopy ob2 = ob1" << std::endl;
+    LOG();
     x = new int;
-    *x = obj.GetX();
+    *x = obj.getX();
     return *this;
   }
 
   // Sample 03: Get and Set Functions
-  int GetX() const { return *x; }
-  void SetX(int m) { *x = m; }
+  int getX() const { return *x; }
+  void setX(int m) { *x = m; }
 
   // Sample 04: Print Function
   void PrintX() { cout << "Int X=" << *x << endl; }
 
   // Sample 05: DeAllocate the heap
   ~DataCopy() {
-    std::cout << "~DataCopy()" << std::endl;
+    LOG();
     delete x;
   }
 };
 
 int main() {
-  DataCopy ob1(10);
-  ob1.PrintX();
+  DataCopy obj1;
+  obj1.setX(10);
+  obj1.PrintX();
 
-  /* remove explicit in copy constructor */
-  /* Can user operator to enable this */
-  DataCopy ob2 = ob1;
-  ob2.PrintX();
+  // Copy Constructor
+  DataCopy obj2(obj1);
+  obj2.PrintX();
 
-  DataCopy ob3(ob1);
-  ob3.PrintX();
+  // Copy Assignment Operator
+  DataCopy obj3;
+  obj3 = obj1;
+  obj3.PrintX();
 }
